@@ -1,7 +1,10 @@
+import { GameScreen } from './components/GameScreen';
+
 export function App() {
   return (
-    <div className="App">
+    <main>
       <p>Hello World</p>
-    </div>
+      <GameScreen></GameScreen>
+    </main>
   );
 }
