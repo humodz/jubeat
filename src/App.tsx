@@ -3,7 +3,5 @@ export function App() {
     <div className="App">
       <p>Hello World</p>
     </div>
-  )
+  );
 }
-
-const x=1;
