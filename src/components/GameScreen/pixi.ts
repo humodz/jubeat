@@ -77,9 +77,9 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
 
   const touchMarkers: PIXI.Graphics[] = [];
 
-  const buttons = range(4).map((row) =>
-    range(4).map((col) => createButtonOutline(col, row)),
-  );
+  const buttons = range(4)
+    .map((row) => range(4).map((col) => createButtonOutline(col, row)))
+    .flat();
 
   pixi.ticker.add(() => {
     if (touchMarkers.length < touchList.length) {
@@ -99,12 +99,27 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
       }
     });
 
-    buttons.forEach((row) => row.forEach((it) => (it.visible = false)));
-    for (const touch of touchList) {
-      const quadrantX = Math.floor(touch.x / 100);
-      const quadrantY = Math.floor(touch.y / 100);
+    const isTouched = repeat(buttons.length, () => false);
 
-      buttons[quadrantY][quadrantX].visible = true;
+    for (const touch of touchList) {
+      const r = 10;
+      check(isTouched, touch.x - r, touch.y - r);
+      check(isTouched, touch.x - r, touch.y + r);
+      check(isTouched, touch.x + r, touch.y - r);
+      check(isTouched, touch.x + r, touch.y + r);
     }
+
+    buttons.forEach((it, i) => (it.visible = isTouched[i]));
   });
+}
+
+function check(isTouched: boolean[], x: number, y: number) {
+  const quadrantX = Math.floor(x / 100);
+  const quadrantY = Math.floor(y / 100);
+
+  if (quadrantX < 0 || quadrantX >= 4 || quadrantY < 0 || quadrantY >= 4) {
+    return;
+  }
+
+  isTouched[quadrantX + quadrantY * 4] = true;
 }
