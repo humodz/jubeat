@@ -56,13 +56,16 @@ export class GameButton {
   }
 
   press() {
-    if (this.marker.playing) {
+    if (!this.marker.playing) {
+      return null;
+    } else {
       const judgement = judge(this.marker.currentFrame);
       console.log('!!!', judgement, this.marker.currentFrame);
       this[judgement].play();
       this[judgement].visible = true;
       this.marker.gotoAndStop(0);
       this.marker.visible = false;
+      return judgement;
     }
   }
 
