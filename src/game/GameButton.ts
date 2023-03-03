@@ -50,13 +50,22 @@ export class GameButton {
     this.outline.visible = visible;
   }
 
-  createAnimatedMarker(textures: PIXI.Texture[], durationMs = 1000) {
+  trigger() {
+    this.marker.play();
+    this.marker.visible = true;
+  }
+
+  private createAnimatedMarker(textures: PIXI.Texture[], durationMs = 1000) {
     const frames = textures.map((texture) => ({
       texture,
       time: durationMs / textures.length,
     }));
 
     const sprite = new PIXI.AnimatedSprite(frames);
+    sprite.onComplete = () => {
+      sprite.visible = false;
+    };
+    sprite.loop = false;
     sprite.visible = false;
     sprite.width = this.props.size;
     sprite.height = this.props.size;
