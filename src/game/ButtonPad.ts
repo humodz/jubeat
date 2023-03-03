@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { range, repeat } from '../components/GameScreen/utils';
+import { range, repeat } from '../utils';
 import { GameButton } from './GameButton';
 import { Point } from './types';
 

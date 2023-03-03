@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { perfect, startHere } from '../../assets';
-import { loadMarker } from './utils';
+import { loadMarker } from '../../game/loaders/marker';
 
 export function wipStartMarker(pixi: PIXI.Application) {
   const sprite = PIXI.Sprite.from(startHere);

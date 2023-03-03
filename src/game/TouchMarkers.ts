@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { repeat } from '../components/GameScreen/utils';
+import { repeat } from '../utils';
 import { Point } from './types';
 
 export class TouchMarkers {

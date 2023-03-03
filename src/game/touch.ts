@@ -1,4 +1,4 @@
-import { clear } from '../components/GameScreen/utils';
+import { clear } from '../utils';
 import { Point } from './types';
 
 export function initTouch(canvas: HTMLCanvasElement) {

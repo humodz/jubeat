@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { ISpritesheetData } from 'pixi.js';
+import { range } from '../../utils';
 
 export async function loadMarker(url: string) {
   const name = `frame-${Math.random()}-`;
@@ -45,28 +46,4 @@ export async function loadMarker(url: string) {
   await sheet.parse();
 
   return sheet;
-}
-
-export function range(length: number) {
-  return Array(length)
-    .fill(0)
-    .map((_, i) => i);
-}
-
-export function repeat<T>(n: number, value: () => T) {
-  return Array(n)
-    .fill(null)
-    .map(() => value());
-}
-
-export function clear<T>(array: T[]): void {
-  array.splice(0, array.length);
-}
-
-export function rotation(normalized: number) {
-  return 2 * Math.PI * normalized;
-}
-
-export function degreesToRadians(degrees: number) {
-  return (2 * Math.PI * degrees) / 360;
 }
