@@ -7,6 +7,13 @@ export interface ButtonPadProps {
   buttonSize: number;
   gridRows: number;
   gridCols: number;
+
+  assets: {
+    marker: PIXI.Texture[];
+    bad: PIXI.Texture[];
+    good: PIXI.Texture[];
+    perfect: PIXI.Texture[];
+  };
 }
 
 export class ButtonPad {
@@ -20,6 +27,7 @@ export class ButtonPad {
           size: props.buttonSize,
           x: props.buttonSize * (i % props.gridCols),
           y: props.buttonSize * Math.floor(i / props.gridCols),
+          assets: props.assets,
         }),
     );
 

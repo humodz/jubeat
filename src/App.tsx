@@ -3,7 +3,7 @@ import { GameScreen } from './components/GameScreen';
 export function App() {
   return (
     <main>
-      <p>Jubeat</p>
+      <p>ok</p>
       <GameScreen></GameScreen>
     </main>
   );

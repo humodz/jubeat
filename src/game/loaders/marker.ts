@@ -2,6 +2,10 @@ import * as PIXI from 'pixi.js';
 import { ISpritesheetData } from 'pixi.js';
 import { range } from '../../utils';
 
+export async function loadMarkers(urls: string[]) {
+  return await Promise.all(urls.map(loadMarker));
+}
+
 export async function loadMarker(url: string) {
   const name = `frame-${Math.random()}-`;
 
