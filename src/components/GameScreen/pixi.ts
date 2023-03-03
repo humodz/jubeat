@@ -63,8 +63,18 @@ interface BeatMapStep {
 }
 
 const beatMap: BeatMapStep[] = [
-  { time: 3, taps: [0, 15] },
-  { time: 3.5, taps: [1, 14] },
-  { time: 4, taps: [2, 13] },
-  { time: 4.5, taps: [3, 12] },
+  { time: 2, taps: [5] },
+  { time: 2.5, taps: [6] },
+  { time: 3, taps: [10] },
+  { time: 3.5, taps: [9] },
+
+  { time: 4, taps: [5] },
+  { time: 4.5, taps: [6] },
+  { time: 5, taps: [10] },
+  { time: 5.5, taps: [9] },
+
+  { time: 6, taps: [5] },
+  { time: 6.5, taps: [6] },
+  { time: 7, taps: [10] },
+  { time: 7.5, taps: [9] },
 ];

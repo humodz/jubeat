@@ -51,7 +51,7 @@ export class GameButton {
   }
 
   play() {
-    this.marker.play();
+    this.marker.gotoAndPlay(0);
     this.marker.visible = true;
   }
 
