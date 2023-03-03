@@ -1,0 +1,1 @@
+convert perfect.jpg -fuzz 15% -transparent black output.png
