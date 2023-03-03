@@ -50,12 +50,21 @@ export class GameButton {
     this.outline.visible = visible;
   }
 
-  trigger() {
+  play() {
     this.marker.play();
     this.marker.visible = true;
   }
 
-  private createAnimatedMarker(textures: PIXI.Texture[], durationMs = 1000) {
+  press() {
+    if (this.marker.playing) {
+      const judgement = judge(this.marker.currentFrame);
+      console.log('!!!', judgement, this.marker.currentFrame);
+      this[judgement].play();
+      this[judgement].visible = true;
+    }
+  }
+
+  private createAnimatedMarker(textures: PIXI.Texture[], durationMs = 800) {
     const frames = textures.map((texture) => ({
       texture,
       time: durationMs / textures.length,
@@ -70,5 +79,19 @@ export class GameButton {
     sprite.width = this.props.size;
     sprite.height = this.props.size;
     return sprite;
+  }
+}
+
+function judge(frame: number): 'bad' | 'good' | 'perfect' {
+  if (frame <= 9) {
+    return 'bad';
+  } else if (frame <= 13) {
+    return 'good';
+  } else if (frame <= 15) {
+    return 'perfect';
+  } else if (frame <= 17) {
+    return 'good';
+  } else {
+    return 'bad';
   }
 }

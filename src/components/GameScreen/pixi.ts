@@ -45,7 +45,7 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
       elapsedSecs >= beatMap[nextIndex].time
     ) {
       for (const button of beatMap[nextIndex].taps) {
-        buttonPad.buttons[button].trigger();
+        buttonPad.buttons[button].play();
       }
 
       nextIndex++;

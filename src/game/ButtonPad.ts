@@ -19,6 +19,7 @@ export interface ButtonPadProps {
 export class ButtonPad {
   node = new PIXI.Container();
   buttons: GameButton[];
+  pressedBefore: boolean[] = [];
 
   constructor(public props: ButtonPadProps) {
     this.buttons = range(props.gridCols * props.gridRows).map(
@@ -31,23 +32,33 @@ export class ButtonPad {
         }),
     );
 
+    this.pressedBefore = repeat(this.buttons.length, () => false);
+
     this.node.addChild(...this.buttons.map((it) => it.node));
   }
 
   tick(touchPoints: Point[]) {
-    const isTouched = repeat(this.buttons.length, () => false);
+    const isPressed = repeat(this.buttons.length, () => false);
 
     for (const touch of touchPoints) {
       const r = 10;
-      this.checkIsTouched(isTouched, touch.x - r, touch.y - r);
-      this.checkIsTouched(isTouched, touch.x - r, touch.y + r);
-      this.checkIsTouched(isTouched, touch.x + r, touch.y - r);
-      this.checkIsTouched(isTouched, touch.x + r, touch.y + r);
+      this.checkIsTouched(isPressed, touch.x - r, touch.y - r);
+      this.checkIsTouched(isPressed, touch.x - r, touch.y + r);
+      this.checkIsTouched(isPressed, touch.x + r, touch.y - r);
+      this.checkIsTouched(isPressed, touch.x + r, touch.y + r);
     }
 
     this.buttons.forEach((it, i) => {
-      it.showOutline(isTouched[i]);
+      it.showOutline(isPressed[i]);
     });
+
+    isPressed.forEach((_, i) => {
+      if (isPressed[i] && !this.pressedBefore[i]) {
+        this.buttons[i].press();
+      }
+    });
+
+    this.pressedBefore = isPressed;
   }
 
   checkIsTouched(isTouched: boolean[], x: number, y: number) {
