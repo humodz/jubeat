@@ -61,7 +61,7 @@ export class GameButton {
     } else {
       const judgement = judge(this.marker.currentFrame);
       console.log('!!!', judgement, this.marker.currentFrame);
-      this[judgement].play();
+      this[judgement].gotoAndPlay(0);
       this[judgement].visible = true;
       this.marker.gotoAndStop(0);
       this.marker.visible = false;
