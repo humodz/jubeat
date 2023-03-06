@@ -12,6 +12,7 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   await sleep(3000);
   const audio = new Audio('/game-data/kimi-wo-nosete.mp3');
   audio.volume = 0.2;
+  audio.loop = false;
 
   await audio.play();
   audio.pause();

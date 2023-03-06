@@ -91,15 +91,15 @@ export class GameButton {
 }
 
 function judge(frame: number): 'bad' | 'good' | 'great' | 'perfect' {
-  if (frame <= 9) {
+  if (frame <= 6) {
     return 'bad';
-  } else if (frame <= 11) {
+  } else if (frame <= 10) {
     return 'good';
   } else if (frame <= 13) {
     return 'great';
-  } else if (frame <= 15) {
+  } else if (frame <= 16) {
     return 'perfect';
-  } else if (frame <= 17) {
+  } else if (frame <= 18) {
     return 'great';
   } else if (frame <= 19) {
     return 'good';
