@@ -9,6 +9,15 @@ import { TouchPointers } from '../../game/TouchPointers';
 const beatMap = kimiWoNosete;
 
 export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
+  await sleep(3000);
+  const audio = new Audio('/game-data/kimi-wo-nosete.mp3');
+  audio.volume = 0.2;
+
+  await audio.play();
+  audio.pause();
+
+  const audioStartTime = 1;
+
   const msg = document.getElementById('msg')!;
 
   const scoreMap = {
@@ -50,7 +59,7 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
 
   const delayMs = (800 / 25) * 15;
   let nextIndex = 0;
-  let elapsedSecs = -(delayMs / 1000) - 3;
+  let elapsedSecs = -(delayMs / 1000) - 1;
   let score = 0;
 
   const maxScore = beatMap
@@ -59,6 +68,11 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
 
   pixi.ticker.add(() => {
     elapsedSecs += pixi.ticker.deltaMS / 1000;
+
+    if (elapsedSecs >= audioStartTime && audio.paused) {
+      audio.play();
+      console.log('playing');
+    }
 
     while (
       nextIndex < beatMap.length &&
@@ -99,3 +113,7 @@ const helloWorldBeatMap: BeatMapStep[] = [
   { time: 7, taps: [10] },
   { time: 7.5, taps: [9] },
 ];
+
+async function sleep(ms: number) {
+  return new Promise((ok) => setTimeout(ok, ms));
+}
