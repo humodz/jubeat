@@ -28,7 +28,7 @@ export class TouchPointers {
 
   createTouchPointer() {
     return new PIXI.Graphics()
-      .beginFill(0xff0000, 0.5)
+      .beginFill(0xffffff, 0.5)
       .drawCircle(0, 0, 20)
       .endFill();
   }

@@ -1,12 +1,22 @@
 import * as PIXI from 'pixi.js';
 import * as assets from '../../assets';
+import kimiWoNosete from '../../game-data/kimi-wo-nosete.beatmap.json';
 import { ButtonPad } from '../../game/ButtonPad';
 import { loadMarkers } from '../../game/loaders/marker';
 import { initTouch } from '../../game/touch';
 import { TouchPointers } from '../../game/TouchPointers';
 
+const beatMap = kimiWoNosete;
+
 export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   const msg = document.getElementById('msg')!;
+
+  const scoreMap = {
+    bad: 0.1,
+    good: 0.4,
+    great: 0.7,
+    perfect: 1.0,
+  };
 
   const touchList = initTouch(pixi.view);
 
@@ -25,7 +35,11 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
       marker: marker.animations.animated,
       bad: bad.animations.animated,
       good: good.animations.animated,
+      great: good.animations.animated,
       perfect: perfect.animations.animated,
+    },
+    onJudgement(judgement) {
+      score += scoreMap[judgement];
     },
   });
 
@@ -34,8 +48,14 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   pixi.stage.addChild(buttonPad.node);
   pixi.stage.addChild(touchMarkers.node);
 
+  const delayMs = (800 / 25) * 15;
   let nextIndex = 0;
-  let elapsedSecs = 0;
+  let elapsedSecs = -(delayMs / 1000) - 3;
+  let score = 0;
+
+  const maxScore = beatMap
+    .map((it) => it.taps.length)
+    .reduce((a, b) => a + b, 0);
 
   pixi.ticker.add(() => {
     elapsedSecs += pixi.ticker.deltaMS / 1000;
@@ -51,7 +71,8 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
       nextIndex++;
     }
 
-    msg.textContent = elapsedSecs.toFixed(0);
+    const realScore = Math.floor((1000000 * score) / maxScore);
+    msg.textContent = `t=${elapsedSecs.toFixed(0)} s=${realScore}`;
     buttonPad.tick(touchList);
     touchMarkers.tick(touchList);
   });
@@ -62,7 +83,7 @@ interface BeatMapStep {
   taps: number[];
 }
 
-const beatMap: BeatMapStep[] = [
+const helloWorldBeatMap: BeatMapStep[] = [
   { time: 2, taps: [5] },
   { time: 2.5, taps: [6] },
   { time: 3, taps: [10] },

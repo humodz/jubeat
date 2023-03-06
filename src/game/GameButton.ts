@@ -9,6 +9,7 @@ export interface GameButtonProps {
     marker: PIXI.Texture[];
     bad: PIXI.Texture[];
     good: PIXI.Texture[];
+    great: PIXI.Texture[];
     perfect: PIXI.Texture[];
   };
 }
@@ -20,6 +21,7 @@ export class GameButton {
   marker: PIXI.AnimatedSprite;
   bad: PIXI.AnimatedSprite;
   good: PIXI.AnimatedSprite;
+  great: PIXI.AnimatedSprite;
   perfect: PIXI.AnimatedSprite;
 
   constructor(public props: GameButtonProps) {
@@ -32,15 +34,17 @@ export class GameButton {
       .drawRect(0, 0, props.size, props.size)
       .endFill();
 
-    this.marker = this.createAnimatedMarker(props.assets.marker);
-    this.bad = this.createAnimatedMarker(props.assets.bad);
-    this.good = this.createAnimatedMarker(props.assets.good);
-    this.perfect = this.createAnimatedMarker(props.assets.perfect);
+    this.marker = this.createAnimatedMarker(props.assets.marker, 800);
+    this.bad = this.createAnimatedMarker(props.assets.bad, 500);
+    this.good = this.createAnimatedMarker(props.assets.good, 500);
+    this.great = this.createAnimatedMarker(props.assets.great, 500);
+    this.perfect = this.createAnimatedMarker(props.assets.perfect, 500);
 
     this.node.addChild(
       this.marker,
       this.bad,
       this.good,
+      this.great,
       this.perfect,
       this.outline,
     );
@@ -60,7 +64,6 @@ export class GameButton {
       return null;
     } else {
       const judgement = judge(this.marker.currentFrame);
-      console.log('!!!', judgement, this.marker.currentFrame);
       this[judgement].gotoAndPlay(0);
       this[judgement].visible = true;
       this.marker.gotoAndStop(0);
@@ -69,7 +72,7 @@ export class GameButton {
     }
   }
 
-  private createAnimatedMarker(textures: PIXI.Texture[], durationMs = 800) {
+  private createAnimatedMarker(textures: PIXI.Texture[], durationMs: number) {
     const frames = textures.map((texture) => ({
       texture,
       time: durationMs / textures.length,
@@ -87,14 +90,18 @@ export class GameButton {
   }
 }
 
-function judge(frame: number): 'bad' | 'good' | 'perfect' {
+function judge(frame: number): 'bad' | 'good' | 'great' | 'perfect' {
   if (frame <= 9) {
     return 'bad';
-  } else if (frame <= 13) {
+  } else if (frame <= 11) {
     return 'good';
+  } else if (frame <= 13) {
+    return 'great';
   } else if (frame <= 15) {
     return 'perfect';
   } else if (frame <= 17) {
+    return 'great';
+  } else if (frame <= 19) {
     return 'good';
   } else {
     return 'bad';

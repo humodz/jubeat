@@ -12,8 +12,11 @@ export interface ButtonPadProps {
     marker: PIXI.Texture[];
     bad: PIXI.Texture[];
     good: PIXI.Texture[];
+    great: PIXI.Texture[];
     perfect: PIXI.Texture[];
   };
+
+  onJudgement(judgement: 'bad' | 'good' | 'great' | 'perfect'): void;
 }
 
 export class ButtonPad {
@@ -54,7 +57,11 @@ export class ButtonPad {
 
     isPressed.forEach((_, i) => {
       if (isPressed[i] && !this.pressedBefore[i]) {
-        this.buttons[i].press();
+        const judgement = this.buttons[i].press();
+
+        if (judgement !== null) {
+          this.props.onJudgement(judgement);
+        }
       }
     });
 
