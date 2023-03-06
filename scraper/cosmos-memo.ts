@@ -91,7 +91,7 @@ async function parse() {
 }
 
 async function download() {
-  const url = 'https://w.atwiki.jp/cosmos_memo/pages/523.html';
+  const url = 'https://w.atwiki.jp/cosmos_memo/pages/522.html';
   const response = await axios.get(url);
 
   const $ = cheerioLoad(response.data);

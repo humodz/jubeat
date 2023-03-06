@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as assets from '../../assets';
-import kimiWoNosete from '../../game-data/kimi-wo-nosete-2.beatmap.json';
+import kimiWoNosete from '../../game-data/kimi-wo-nosete-6.beatmap.json';
 import { ButtonPad } from '../../game/ButtonPad';
 import { loadMarkers } from '../../game/loaders/marker';
 import { initTouch } from '../../game/touch';
