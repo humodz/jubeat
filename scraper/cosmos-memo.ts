@@ -10,6 +10,7 @@ interface BeatMapStep {
 }
 
 async function main() {
+  await download();
   await parse();
 }
 
@@ -90,9 +91,8 @@ async function parse() {
 }
 
 async function download() {
-  const response = await axios.get(
-    'https://w.atwiki.jp/cosmos_memo/pages/521.html',
-  );
+  const url = 'https://w.atwiki.jp/cosmos_memo/pages/523.html';
+  const response = await axios.get(url);
 
   const $ = cheerioLoad(response.data);
   const text = $('#wikibody p').text().trim();

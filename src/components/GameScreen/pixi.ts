@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as assets from '../../assets';
-import kimiWoNosete from '../../game-data/kimi-wo-nosete.beatmap.json';
+import kimiWoNosete from '../../game-data/kimi-wo-nosete-2.beatmap.json';
 import { ButtonPad } from '../../game/ButtonPad';
 import { loadMarkers } from '../../game/loaders/marker';
 import { initTouch } from '../../game/touch';
@@ -12,12 +12,9 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   await sleep(3000);
   const audio = new Audio('/game-data/kimi-wo-nosete.mp3');
   audio.volume = 0.2;
-  audio.loop = false;
 
   await audio.play();
   audio.pause();
-
-  const audioStartTime = 1;
 
   const msg = document.getElementById('msg')!;
 
@@ -58,10 +55,12 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   pixi.stage.addChild(buttonPad.node);
   pixi.stage.addChild(touchMarkers.node);
 
-  const delayMs = (800 / 25) * 15;
+  const delaySecs = (0.8 / 25) * 15;
+  const audioLagSeconds = 0.2;
   let nextIndex = 0;
-  let elapsedSecs = -(delayMs / 1000) - 1;
+  let elapsedSecs = -1;
   let score = 0;
+  let audioStarted = false;
 
   const maxScore = beatMap
     .map((it) => it.taps.length)
@@ -70,14 +69,15 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   pixi.ticker.add(() => {
     elapsedSecs += pixi.ticker.deltaMS / 1000;
 
-    if (elapsedSecs >= audioStartTime && audio.paused) {
+    if (elapsedSecs >= 0 && !audioStarted) {
+      audioStarted = true;
       audio.play();
       console.log('playing');
     }
 
     while (
       nextIndex < beatMap.length &&
-      elapsedSecs >= beatMap[nextIndex].time
+      elapsedSecs + delaySecs + audioLagSeconds >= beatMap[nextIndex].time
     ) {
       for (const button of beatMap[nextIndex].taps) {
         buttonPad.buttons[button].play();
