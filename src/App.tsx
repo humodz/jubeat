@@ -1,10 +1,9 @@
-import { GameScreen } from './components/GameScreen';
+import { SongList } from './components/SongList';
 
 export function App() {
   return (
     <main>
-      <p id="msg">ok</p>
-      <GameScreen></GameScreen>
+      <SongList />
     </main>
   );
 }

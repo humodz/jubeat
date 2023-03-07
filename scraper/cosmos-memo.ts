@@ -86,8 +86,9 @@ async function parse() {
     }
   }
 
-  // const song = { songName, author, difficulty, level, bpm, notes };
-  console.log(JSON.stringify(beatMap, null, 2));
+  const song = { songName, author, difficulty, level, bpm, notes };
+  console.log(JSON.stringify(song, null, 2));
+  // console.log(JSON.stringify(beatMap, null, 2));
 }
 
 async function download() {

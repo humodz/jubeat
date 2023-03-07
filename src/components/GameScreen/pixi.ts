@@ -56,7 +56,7 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   pixi.stage.addChild(touchMarkers.node);
 
   const delaySecs = (0.8 / 25) * 15;
-  const audioLagSeconds = 0.2;
+  const audioLagSeconds = 0.5;
   let nextIndex = 0;
   let elapsedSecs = -1;
   let score = 0;

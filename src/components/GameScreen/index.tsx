@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { createRef, useEffect } from 'react';
 import { initPixi } from './pixi';
+import styles from './styles.module.css';
 
 export function GameScreen() {
   const myRef = createRef<HTMLDivElement>();
@@ -19,7 +20,6 @@ export function GameScreen() {
 
     element.textContent = '';
     element.append(pixi.view);
-    pixi.view.style.maxWidth = '100%';
 
     const promise = initPixi(pixi);
 
@@ -28,5 +28,5 @@ export function GameScreen() {
     };
   }, [myRef]);
 
-  return <div ref={myRef}></div>;
+  return <div ref={myRef} className={styles.canvasContainer}></div>;
 }
