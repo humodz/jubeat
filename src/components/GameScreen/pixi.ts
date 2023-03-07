@@ -9,14 +9,11 @@ import { TouchPointers } from '../../game/TouchPointers';
 const beatMap = kimiWoNosete;
 
 export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
-  await sleep(3000);
   const audio = new Audio('/game-data/kimi-wo-nosete.mp3');
   audio.volume = 0.2;
 
   await audio.play();
   audio.pause();
-
-  const msg = document.getElementById('msg')!;
 
   const scoreMap = {
     bad: 0.1,
@@ -72,7 +69,6 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
     if (elapsedSecs >= 0 && !audioStarted) {
       audioStarted = true;
       audio.play();
-      console.log('playing');
     }
 
     while (
@@ -87,34 +83,7 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
     }
 
     const realScore = Math.floor((1000000 * score) / maxScore);
-    msg.textContent = `t=${elapsedSecs.toFixed(0)} s=${realScore}`;
     buttonPad.tick(touchList);
     touchMarkers.tick(touchList);
   });
-}
-
-interface BeatMapStep {
-  time: number;
-  taps: number[];
-}
-
-const helloWorldBeatMap: BeatMapStep[] = [
-  { time: 2, taps: [5] },
-  { time: 2.5, taps: [6] },
-  { time: 3, taps: [10] },
-  { time: 3.5, taps: [9] },
-
-  { time: 4, taps: [5] },
-  { time: 4.5, taps: [6] },
-  { time: 5, taps: [10] },
-  { time: 5.5, taps: [9] },
-
-  { time: 6, taps: [5] },
-  { time: 6.5, taps: [6] },
-  { time: 7, taps: [10] },
-  { time: 7.5, taps: [9] },
-];
-
-async function sleep(ms: number) {
-  return new Promise((ok) => setTimeout(ok, ms));
 }
