@@ -1,18 +1,24 @@
 export interface Song {
   songName: string;
   author: string;
-  beatMaps: Record<Difficulty, BeatMap | null>;
+  track: Track;
+  beatMaps: Record<Level, BeatMap | null>;
 }
 
-export enum Difficulty {
+export interface Track {
+  url: string;
+  volume: number;
+  lagSeconds: number;
+}
+
+export enum Level {
   BASIC = 'BASIC',
   ADVANCED = 'ADVANCED',
   EXTREME = 'EXTREME',
 }
 
 export interface BeatMap {
-  difficulty: Difficulty;
-  level: number;
+  difficulty: number;
   data: BeatMapStep[];
 }
 

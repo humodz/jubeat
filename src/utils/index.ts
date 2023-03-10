@@ -21,3 +21,7 @@ export function rotation(normalized: number) {
 export function degreesToRadians(degrees: number) {
   return (2 * Math.PI * degrees) / 360;
 }
+
+export function last<T>(items: T[]): T {
+  return items[items.length - 1];
+}

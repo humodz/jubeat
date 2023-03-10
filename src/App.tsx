@@ -1,5 +1,5 @@
-import { GameScreen } from './components/GameScreen';
-import { SongList } from './components/SongList';
+import { GameScreen } from './screens/GameScreen';
+import { SongListScreen } from './screens/SongListScreen';
 import { useAppSelector } from './store';
 import { AppScreen, selectScreen } from './store/appSlice';
 
@@ -10,7 +10,7 @@ export function App() {
     <main>
       <p>{screen}</p>
       {screen === AppScreen.SONG_LIST ? (
-        <SongList />
+        <SongListScreen />
       ) : screen === AppScreen.GAME ? (
         <GameScreen />
       ) : (

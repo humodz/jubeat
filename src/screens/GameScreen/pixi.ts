@@ -1,16 +1,24 @@
 import * as PIXI from 'pixi.js';
 import * as assets from '../../assets';
-import kimiWoNosete from '../../game-data/kimi-wo-nosete-6.beatmap.json';
 import { ButtonPad } from '../../game/ButtonPad';
 import { loadMarkers } from '../../game/loaders/marker';
 import { initTouch } from '../../game/touch';
 import { TouchPointers } from '../../game/TouchPointers';
+import { BeatMapStep, Song } from '../../types';
 
-const beatMap = kimiWoNosete;
+interface InitPixiArgs {
+  song: Song;
+  beatMap: BeatMapStep[];
+  onScoreUpdate: (score: number) => void;
+  onFinish: () => void;
+}
 
-export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
-  const audio = new Audio('/game-data/kimi-wo-nosete.mp3');
-  audio.volume = 0.2;
+export async function initPixi(
+  pixi: PIXI.Application<HTMLCanvasElement>,
+  { song, beatMap, onScoreUpdate }: InitPixiArgs,
+) {
+  const audio = new Audio(song.track.url);
+  audio.volume = song.track.volume;
 
   await audio.play();
   audio.pause();
@@ -53,7 +61,8 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
   pixi.stage.addChild(touchMarkers.node);
 
   const delaySecs = (0.8 / 25) * 15;
-  const audioLagSeconds = 0.5;
+  const audioLagSeconds = song.track.lagSeconds;
+
   let nextIndex = 0;
   let elapsedSecs = -1;
   let score = 0;
@@ -83,6 +92,8 @@ export async function initPixi(pixi: PIXI.Application<HTMLCanvasElement>) {
     }
 
     const realScore = Math.floor((1000000 * score) / maxScore);
+    onScoreUpdate(realScore);
+
     buttonPad.tick(touchList);
     touchMarkers.tick(touchList);
   });
