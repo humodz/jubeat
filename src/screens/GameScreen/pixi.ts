@@ -5,6 +5,7 @@ import { loadMarkers } from '../../game/loaders/marker';
 import { initTouch } from '../../game/touch';
 import { TouchPointers } from '../../game/TouchPointers';
 import { BeatMapStep, Song } from '../../types';
+import { last } from '../../utils';
 
 interface InitPixiArgs {
   song: Song;
@@ -15,7 +16,7 @@ interface InitPixiArgs {
 
 export async function initPixi(
   pixi: PIXI.Application<HTMLCanvasElement>,
-  { song, beatMap, onScoreUpdate }: InitPixiArgs,
+  { song, beatMap, onScoreUpdate, onFinish }: InitPixiArgs,
 ) {
   const audio = new Audio(song.track.url);
   audio.volume = song.track.volume;
@@ -68,6 +69,8 @@ export async function initPixi(
   let score = 0;
   let audioStarted = false;
 
+  const endTime = last(beatMap).time + 2;
+
   const maxScore = beatMap
     .map((it) => it.taps.length)
     .reduce((a, b) => a + b, 0);
@@ -78,6 +81,12 @@ export async function initPixi(
     if (elapsedSecs >= 0 && !audioStarted) {
       audioStarted = true;
       audio.play();
+    }
+
+    if (elapsedSecs >= endTime) {
+      audio.pause();
+      pixi.ticker.stop();
+      onFinish();
     }
 
     while (

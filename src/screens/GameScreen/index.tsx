@@ -1,11 +1,18 @@
 import * as PIXI from 'pixi.js';
 import { createRef, useEffect, useMemo, useState } from 'react';
-import { useAppSelector } from '../../store';
-import { selectBeatmap, selectSong } from '../../store/appSlice';
+import { useAppDispatch, useAppSelector } from '../../store';
+import {
+  AppScreen,
+  navigate,
+  selectBeatmap,
+  selectSong,
+} from '../../store/appSlice';
 import { initPixi } from './pixi';
 import styles from './styles.module.css';
 
 export function GameScreen() {
+  const dispatch = useAppDispatch();
+
   const song = useAppSelector(selectSong);
   const beatMap = useAppSelector(selectBeatmap);
   const [score, setScore] = useState(0);
@@ -42,14 +49,22 @@ export function GameScreen() {
       beatMap: beatMap.data,
       onScoreUpdate: setScore,
       onFinish() {
-        /* ... */
+        dispatch(navigate(AppScreen.SONG_LIST));
       },
     });
 
     return () => {
       promise.finally(() => pixi.destroy());
     };
-  }, [pixi, song, beatMap]);
+  }, [dispatch, pixi, song, beatMap]);
+
+  const pause = () => {
+    pixi.ticker.stop();
+  };
+
+  const unpause = () => {
+    pixi.ticker.start();
+  };
 
   if (!song || !beatMap) {
     return <p>ERROR Missing song or beatmap</p>;
@@ -60,7 +75,11 @@ export function GameScreen() {
       <div>
         {song.songName} {beatMap.difficulty}
       </div>
-      <div>{score}</div>
+      <div>
+        {score}
+        <button onClick={pause}>Pause</button>{' '}
+        <button onClick={unpause}>Unpause</button>
+      </div>
       <div ref={myRef} className={styles.canvasContainer}></div>
     </main>
   );

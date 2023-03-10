@@ -12,7 +12,7 @@ const songs: Song[] = [
     ...kimiWoNosete,
     track: {
       url: '/game-data/kimi-wo-nosete.mp3',
-      volume: 0.5,
+      volume: 0.25,
       lagSeconds: 0.5,
     },
     beatMaps: {
