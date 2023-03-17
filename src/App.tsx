@@ -7,8 +7,7 @@ export function App() {
   const screen = useAppSelector(selectScreen);
 
   return (
-    <main>
-      <p>{screen}</p>
+    <>
       {screen === AppScreen.SONG_LIST ? (
         <SongListScreen />
       ) : screen === AppScreen.GAME ? (
@@ -16,6 +15,6 @@ export function App() {
       ) : (
         <p>Unknown screen</p>
       )}
-    </main>
+    </>
   );
 }

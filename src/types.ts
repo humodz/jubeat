@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 export interface Song {
   songName: string;
   author: string;
@@ -25,4 +27,11 @@ export interface BeatMap {
 export interface BeatMapStep {
   time: number;
   taps: number[];
+}
+export interface Assets {
+  marker: PIXI.Texture[];
+  bad: PIXI.Texture[];
+  good: PIXI.Texture[];
+  great: PIXI.Texture[];
+  perfect: PIXI.Texture[];
 }

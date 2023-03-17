@@ -28,7 +28,7 @@ export const appSlice = createSlice({
       state.beatMap = undefined;
     },
     playSong(state, action: PayloadAction<{ song: Song; beatMap: BeatMap }>) {
-      state.screen = AppScreen.GAME;
+      // state.screen = AppScreen.LOADING_GAME;
       state.song = action.payload.song;
       state.beatMap = action.payload.beatMap;
     },

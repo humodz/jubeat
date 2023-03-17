@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
-import * as assets from '../../assets';
 import { ButtonPad } from '../../game/ButtonPad';
-import { loadMarkers } from '../../game/loaders/marker';
+import { loadAssets } from '../../game/loaders/assets';
+import { loadTrack } from '../../game/loaders/track';
 import { initTouch } from '../../game/touch';
 import { TouchPointers } from '../../game/TouchPointers';
 import { BeatMapStep, Song } from '../../types';
@@ -18,11 +18,9 @@ export async function initPixi(
   pixi: PIXI.Application<HTMLCanvasElement>,
   { song, beatMap, onScoreUpdate, onFinish }: InitPixiArgs,
 ) {
-  const audio = new Audio(song.track.url);
+  const trackUrl = await loadTrack(song);
+  const audio = new Audio(trackUrl);
   audio.volume = song.track.volume;
-
-  await audio.play();
-  audio.pause();
 
   const scoreMap = {
     bad: 0.1,
@@ -33,24 +31,13 @@ export async function initPixi(
 
   const touchList = initTouch(pixi.view);
 
-  const [marker, bad, good, perfect] = await loadMarkers([
-    assets.marker,
-    assets.bad,
-    assets.good,
-    assets.perfect,
-  ]);
+  const loadedAssets = await loadAssets();
 
   const buttonPad = new ButtonPad({
     buttonSize: 100,
     gridCols: 4,
     gridRows: 4,
-    assets: {
-      marker: marker.animations.animated,
-      bad: bad.animations.animated,
-      good: good.animations.animated,
-      great: good.animations.animated,
-      perfect: perfect.animations.animated,
-    },
+    assets: loadedAssets,
     onJudgement(judgement) {
       score += scoreMap[judgement];
     },
