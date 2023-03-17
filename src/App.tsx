@@ -1,20 +1,6 @@
-import { GameScreen } from './screens/GameScreen';
-import { SongListScreen } from './screens/SongListScreen';
-import { useAppSelector } from './store';
-import { AppScreen, selectScreen } from './store/appSlice';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './routes';
 
 export function App() {
-  const screen = useAppSelector(selectScreen);
-
-  return (
-    <>
-      {screen === AppScreen.SONG_LIST ? (
-        <SongListScreen />
-      ) : screen === AppScreen.GAME ? (
-        <GameScreen />
-      ) : (
-        <p>Unknown screen</p>
-      )}
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
