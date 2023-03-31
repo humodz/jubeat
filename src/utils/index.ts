@@ -25,3 +25,7 @@ export function degreesToRadians(degrees: number) {
 export function last<T>(items: T[]): T {
   return items[items.length - 1];
 }
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((ok) => setTimeout(ok, ms));
+}

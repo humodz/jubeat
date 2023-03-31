@@ -1,12 +1,14 @@
 import * as PIXI from 'pixi.js';
-import { createRef, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { initPixi } from '../../game/pixi';
-import { BeatMap, Song } from '../../game/types';
+import { Assets, BeatMap, Song } from '../../game/types';
 import styles from './styles.module.css';
 
 export interface GameSessionProps {
   song: Song;
   beatMap: BeatMap;
+  trackBlobUrl: string;
+  assets: Assets;
   onFinish?: () => void;
 }
 
@@ -16,52 +18,42 @@ const PixiApp = PIXI.Application<HTMLCanvasElement>;
 export function GameSession(props: GameSessionProps) {
   const [score, setScore] = useState(0);
 
-  const myRef = createRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const pixi = useInit(
-    () =>
-      new PixiApp({
-        width: 400,
-        height: 400,
-      }),
-  );
+  const pixiRef = useRef<PixiApp>();
+  const getPixi = () => pixiRef.current!;
 
   useEffect(() => {
-    if (!myRef.current) {
+    const element = containerRef.current;
+
+    if (!element || !props.song || !props.beatMap) {
       return;
     }
 
-    const element = myRef.current;
+    const pixi = new PixiApp({ width: 400, height: 400 });
+    pixiRef.current = pixi;
 
     element.textContent = '';
     element.append(pixi.view);
-  }, [myRef, pixi]);
 
-  useEffect(() => {
-    if (!props.song || !props.beatMap) {
-      return;
-    }
-
-    const promise = initPixi(pixi, {
+    initPixi(pixi, {
       song: props.song,
       beatMap: props.beatMap.data,
+      trackBlobUrl: props.trackBlobUrl,
+      assets: props.assets,
       onScoreUpdate: setScore,
-      onFinish() {
-        props.onFinish?.();
-      },
+      onFinish: props.onFinish,
     });
 
-    return () => {
-      promise.finally(() => pixi.destroy());
-    };
-  }, [pixi, props]);
+    return () => pixi.destroy();
+  }, [props]);
 
   const pause = () => {
-    pixi.ticker.stop();
+    getPixi().ticker.stop();
   };
 
   const unpause = () => {
-    pixi.ticker.start();
+    getPixi().ticker.start();
   };
 
   if (!props.song || !props.beatMap) {
@@ -78,19 +70,7 @@ export function GameSession(props: GameSessionProps) {
         <button onClick={pause}>Pause</button>{' '}
         <button onClick={unpause}>Unpause</button>
       </div>
-      <div ref={myRef} className={styles.canvasContainer}></div>
+      <div ref={containerRef} className={styles.canvasContainer}></div>
     </main>
   );
-}
-
-function useInit<T>(factory: () => T): T {
-  const initialized = useRef(false);
-  const ref = useRef<T>();
-
-  if (!initialized.current) {
-    initialized.current = true;
-    ref.current = factory();
-  }
-
-  return ref.current!;
 }

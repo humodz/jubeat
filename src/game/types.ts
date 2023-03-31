@@ -9,7 +9,7 @@ export interface Song {
   songName: string;
   author: string;
   track: Track;
-  beatMaps: Record<Level, BeatMap | null>;
+  beatMaps: Partial<Record<Level, BeatMap | null>>;
 }
 
 export interface Track {

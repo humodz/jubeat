@@ -1,26 +1,25 @@
 import * as PIXI from 'pixi.js';
 import { last } from '../utils';
 import { ButtonPad } from './ButtonPad';
-import { loadAssets } from './loaders/assets';
-import { loadTrack } from './loaders/track';
 import { initTouch } from './touch';
 import { TouchPointers } from './TouchPointers';
-import { BeatMapStep, Song } from './types';
+import { Assets, BeatMapStep, Song } from './types';
 
 interface InitPixiArgs {
   song: Song;
   beatMap: BeatMapStep[];
-  onScoreUpdate: (score: number) => void;
-  onFinish: () => void;
+  trackBlobUrl: string;
+  assets: Assets;
+  onScoreUpdate?: (score: number) => void;
+  onFinish?: () => void;
 }
 
-export async function initPixi(
+export function initPixi(
   pixi: PIXI.Application<HTMLCanvasElement>,
-  { song, beatMap, onScoreUpdate, onFinish }: InitPixiArgs,
+  args: InitPixiArgs,
 ) {
-  const trackUrl = await loadTrack(song);
-  const audio = new Audio(trackUrl);
-  audio.volume = song.track.volume;
+  const audio = new Audio(args.trackBlobUrl);
+  audio.volume = args.song.track.volume;
 
   const scoreMap = {
     bad: 0.1,
@@ -31,13 +30,11 @@ export async function initPixi(
 
   const touchList = initTouch(pixi.view);
 
-  const loadedAssets = await loadAssets();
-
   const buttonPad = new ButtonPad({
     buttonSize: 100,
     gridCols: 4,
     gridRows: 4,
-    assets: loadedAssets,
+    assets: args.assets,
     onJudgement(judgement) {
       score += scoreMap[judgement];
     },
@@ -49,16 +46,16 @@ export async function initPixi(
   pixi.stage.addChild(touchMarkers.node);
 
   const delaySecs = (0.8 / 25) * 15;
-  const audioLagSeconds = song.track.lagSeconds;
+  const audioLagSeconds = args.song.track.lagSeconds;
 
   let nextIndex = 0;
   let elapsedSecs = -1;
   let score = 0;
   let audioStarted = false;
 
-  const endTime = last(beatMap).time + 2;
+  const endTime = last(args.beatMap).time + 2;
 
-  const maxScore = beatMap
+  const maxScore = args.beatMap
     .map((it) => it.taps.length)
     .reduce((a, b) => a + b, 0);
 
@@ -73,14 +70,14 @@ export async function initPixi(
     if (elapsedSecs >= endTime) {
       audio.pause();
       pixi.ticker.stop();
-      onFinish();
+      args.onFinish?.();
     }
 
     while (
-      nextIndex < beatMap.length &&
-      elapsedSecs + delaySecs + audioLagSeconds >= beatMap[nextIndex].time
+      nextIndex < args.beatMap.length &&
+      elapsedSecs + delaySecs + audioLagSeconds >= args.beatMap[nextIndex].time
     ) {
-      for (const button of beatMap[nextIndex].taps) {
+      for (const button of args.beatMap[nextIndex].taps) {
         buttonPad.buttons[button].play();
       }
 
@@ -88,7 +85,7 @@ export async function initPixi(
     }
 
     const realScore = Math.floor((1000000 * score) / maxScore);
-    onScoreUpdate(realScore);
+    args.onScoreUpdate?.(realScore);
 
     buttonPad.tick(touchList);
     touchMarkers.tick(touchList);
