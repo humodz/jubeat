@@ -58,8 +58,8 @@ export function GameComponent(props: GameComponentProps) {
       <div>
         {props.song.songName} {props.beatMap.difficulty}
       </div>
+      <div>{score}</div>
       <div>
-        {score}
         <button onClick={pause}>Pause</button>{' '}
         <button onClick={resume}>Unpause</button>
       </div>

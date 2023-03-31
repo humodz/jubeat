@@ -5,6 +5,7 @@ export async function loadAudio(url: string) {
   const blobUrl = URL.createObjectURL(data);
 
   const audio = new Audio(blobUrl);
+  audio.loop = false;
 
   await waitEvent(audio, 'canplaythrough');
 

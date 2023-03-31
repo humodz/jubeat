@@ -55,8 +55,9 @@ export class Game {
     this.maxScore = props.beatMap
       .map((it) => it.taps.length)
       .reduce((a, b) => a + b, 0);
-
     this.pixi.ticker.add(() => this.onTick());
+
+    console.log('!!!', this.props.audio.duration);
   }
 
   initGraphics() {
@@ -79,26 +80,24 @@ export class Game {
   }
 
   onTick() {
-    const delaySecs = MARKER_DELAY_SECS;
-    const audioLagSecs = this.props.song.track.lagSeconds;
-
-    this.elapsedSecs += this.pixi.ticker.deltaMS / 1000;
-
-    if (this.elapsedSecs >= 0 && !this.audioStarted) {
+    if (!this.audioStarted) {
       this.audioStarted = true;
       this.props.audio.play();
     }
 
-    if (this.elapsedSecs >= this.endTime) {
-      this.props.audio.pause();
+    const elapsedSecs = this.props.audio.currentTime;
+
+    if (elapsedSecs === this.props.audio.duration) {
       this.pixi.ticker.stop();
       this.props.onFinish?.();
     }
 
+    const realElapsedSecs =
+      elapsedSecs + MARKER_DELAY_SECS + this.props.song.track.lagSeconds;
+
     while (
       this.nextIndex < this.props.beatMap.length &&
-      this.elapsedSecs + delaySecs + audioLagSecs >=
-        this.props.beatMap[this.nextIndex].time
+      realElapsedSecs >= this.props.beatMap[this.nextIndex].time
     ) {
       for (const button of this.props.beatMap[this.nextIndex].taps) {
         this.buttonPad.buttons[button].play();
@@ -123,6 +122,7 @@ export class Game {
   }
 
   destroy() {
+    this.props.audio.pause();
     this.pixi.destroy();
   }
 }
