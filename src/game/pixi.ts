@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js';
-import { ButtonPad } from '../../game/ButtonPad';
-import { loadAssets } from '../../game/loaders/assets';
-import { loadTrack } from '../../game/loaders/track';
-import { initTouch } from '../../game/touch';
-import { TouchPointers } from '../../game/TouchPointers';
-import { BeatMapStep, Song } from '../../types';
-import { last } from '../../utils';
+import { last } from '../utils';
+import { ButtonPad } from './ButtonPad';
+import { loadAssets } from './loaders/assets';
+import { loadTrack } from './loaders/track';
+import { initTouch } from './touch';
+import { TouchPointers } from './TouchPointers';
+import { BeatMapStep, Song } from './types';
 
 interface InitPixiArgs {
   song: Song;

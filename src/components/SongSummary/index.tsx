@@ -1,4 +1,4 @@
-import { Level, Song } from '../../types';
+import { Level, Song } from '../../game/types';
 
 interface SongSummaryProps {
   song: Song;

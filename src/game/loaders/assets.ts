@@ -1,5 +1,5 @@
 import * as assets from '../../assets';
-import { Assets } from '../../types';
+import { Assets } from '../types';
 import { loadMarkers } from './marker';
 
 export async function loadAssets(): Promise<Assets> {

@@ -1,32 +1,30 @@
 import * as PIXI from 'pixi.js';
-import { createRef, useEffect, useMemo, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store';
-import {
-  AppScreen,
-  navigate,
-  selectBeatmap,
-  selectSong,
-} from '../../store/appSlice';
-import { initPixi } from './pixi';
+import { createRef, useEffect, useRef, useState } from 'react';
+import { initPixi } from '../../game/pixi';
+import { BeatMap, Song } from '../../game/types';
 import styles from './styles.module.css';
 
-export function GameScreen() {
-  const dispatch = useAppDispatch();
+export interface GameSessionProps {
+  song: Song;
+  beatMap: BeatMap;
+  onFinish?: () => void;
+}
 
-  const song = useAppSelector(selectSong);
-  const beatMap = useAppSelector(selectBeatmap);
+type PixiApp = PIXI.Application<HTMLCanvasElement>;
+const PixiApp = PIXI.Application<HTMLCanvasElement>;
+
+export function GameSession(props: GameSessionProps) {
   const [score, setScore] = useState(0);
 
-  const pixi = useMemo(
+  const myRef = createRef<HTMLDivElement>();
+
+  const pixi = useInit(
     () =>
-      new PIXI.Application<HTMLCanvasElement>({
+      new PixiApp({
         width: 400,
         height: 400,
       }),
-    [],
   );
-
-  const myRef = createRef<HTMLDivElement>();
 
   useEffect(() => {
     if (!myRef.current) {
@@ -37,26 +35,26 @@ export function GameScreen() {
 
     element.textContent = '';
     element.append(pixi.view);
-  }, [myRef, pixi.view]);
+  }, [myRef, pixi]);
 
   useEffect(() => {
-    if (!song || !beatMap) {
+    if (!props.song || !props.beatMap) {
       return;
     }
 
     const promise = initPixi(pixi, {
-      song,
-      beatMap: beatMap.data,
+      song: props.song,
+      beatMap: props.beatMap.data,
       onScoreUpdate: setScore,
       onFinish() {
-        dispatch(navigate(AppScreen.SONG_LIST));
+        props.onFinish?.();
       },
     });
 
     return () => {
       promise.finally(() => pixi.destroy());
     };
-  }, [dispatch, pixi, song, beatMap]);
+  }, [pixi, props]);
 
   const pause = () => {
     pixi.ticker.stop();
@@ -66,14 +64,14 @@ export function GameScreen() {
     pixi.ticker.start();
   };
 
-  if (!song || !beatMap) {
+  if (!props.song || !props.beatMap) {
     return <p>ERROR Missing song or beatmap</p>;
   }
 
   return (
     <main>
       <div>
-        {song.songName} {beatMap.difficulty}
+        {props.song.songName} {props.beatMap.difficulty}
       </div>
       <div>
         {score}
@@ -83,4 +81,16 @@ export function GameScreen() {
       <div ref={myRef} className={styles.canvasContainer}></div>
     </main>
   );
+}
+
+function useInit<T>(factory: () => T): T {
+  const initialized = useRef(false);
+  const ref = useRef<T>();
+
+  if (!initialized.current) {
+    initialized.current = true;
+    ref.current = factory();
+  }
+
+  return ref.current!;
 }
