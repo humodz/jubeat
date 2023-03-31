@@ -1,5 +1,10 @@
 import * as PIXI from 'pixi.js';
 import { repeat } from '../utils';
+import {
+  TOUCH_MARKER_ALPHA,
+  TOUCH_MARKER_COLOR,
+  TOUCH_MARKER_RADIUS,
+} from './constants';
 import { Point } from './types';
 
 export class TouchPointers {
@@ -28,8 +33,8 @@ export class TouchPointers {
 
   createTouchPointer() {
     return new PIXI.Graphics()
-      .beginFill(0xffffff, 0.5)
-      .drawCircle(0, 0, 20)
+      .beginFill(TOUCH_MARKER_COLOR, TOUCH_MARKER_ALPHA)
+      .drawCircle(0, 0, TOUCH_MARKER_RADIUS)
       .endFill();
   }
 }

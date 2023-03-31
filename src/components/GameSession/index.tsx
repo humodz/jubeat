@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { useEffect, useRef, useState } from 'react';
+import { CANVAS_SIZE } from '../../game/constants';
 import { initPixi } from '../../game/pixi';
 import { Assets, BeatMap, Song } from '../../game/types';
 import styles from './styles.module.css';
@@ -30,7 +31,7 @@ export function GameSession(props: GameSessionProps) {
       return;
     }
 
-    const pixi = new PixiApp({ width: 400, height: 400 });
+    const pixi = new PixiApp({ width: CANVAS_SIZE, height: CANVAS_SIZE });
     pixiRef.current = pixi;
 
     element.textContent = '';

@@ -1,6 +1,12 @@
 import * as PIXI from 'pixi.js';
 import { last } from '../utils';
 import { ButtonPad } from './ButtonPad';
+import {
+  BUTTON_SIZE,
+  GRID_COLS,
+  GRID_ROWS,
+  MARKER_DELAY_SECS,
+} from './constants';
 import { initTouch } from './touch';
 import { TouchPointers } from './TouchPointers';
 import { Assets, BeatMapStep, Song } from './types';
@@ -31,9 +37,9 @@ export function initPixi(
   const touchList = initTouch(pixi.view);
 
   const buttonPad = new ButtonPad({
-    buttonSize: 100,
-    gridCols: 4,
-    gridRows: 4,
+    buttonSize: BUTTON_SIZE,
+    gridCols: GRID_COLS,
+    gridRows: GRID_ROWS,
     assets: args.assets,
     onJudgement(judgement) {
       score += scoreMap[judgement];
@@ -45,8 +51,8 @@ export function initPixi(
   pixi.stage.addChild(buttonPad.node);
   pixi.stage.addChild(touchMarkers.node);
 
-  const delaySecs = (0.8 / 25) * 15;
-  const audioLagSeconds = args.song.track.lagSeconds;
+  const delaySecs = MARKER_DELAY_SECS;
+  const audioLagSecs = args.song.track.lagSeconds;
 
   let nextIndex = 0;
   let elapsedSecs = -1;
@@ -75,7 +81,7 @@ export function initPixi(
 
     while (
       nextIndex < args.beatMap.length &&
-      elapsedSecs + delaySecs + audioLagSeconds >= args.beatMap[nextIndex].time
+      elapsedSecs + delaySecs + audioLagSecs >= args.beatMap[nextIndex].time
     ) {
       for (const button of args.beatMap[nextIndex].taps) {
         buttonPad.buttons[button].play();

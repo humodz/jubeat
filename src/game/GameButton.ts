@@ -1,4 +1,10 @@
 import * as PIXI from 'pixi.js';
+import {
+  BUTTON_OUTLINE_COLOR,
+  BUTTON_OUTLINE_THICKNESS,
+  MARKER_DURATION_MS,
+  MARKER_JUDGEMENT_DURATION_MS,
+} from './constants';
 
 export interface GameButtonProps {
   size: number;
@@ -29,16 +35,19 @@ export class GameButton {
     this.node.y = props.y;
 
     this.outline
-      .lineStyle(5, 0x3399ff, 1, 0)
+      .lineStyle(BUTTON_OUTLINE_THICKNESS, BUTTON_OUTLINE_COLOR, 1, 0)
       .beginFill(0, 0)
       .drawRect(0, 0, props.size, props.size)
       .endFill();
 
-    this.marker = this.createAnimatedMarker(props.assets.marker, 800);
-    this.bad = this.createAnimatedMarker(props.assets.bad, 500);
-    this.good = this.createAnimatedMarker(props.assets.good, 500);
-    this.great = this.createAnimatedMarker(props.assets.great, 500);
-    this.perfect = this.createAnimatedMarker(props.assets.perfect, 500);
+    const markerMs = MARKER_DURATION_MS;
+    const judgeMs = MARKER_JUDGEMENT_DURATION_MS;
+
+    this.marker = this.createAnimatedMarker(props.assets.marker, markerMs);
+    this.bad = this.createAnimatedMarker(props.assets.bad, judgeMs);
+    this.good = this.createAnimatedMarker(props.assets.good, judgeMs);
+    this.great = this.createAnimatedMarker(props.assets.great, judgeMs);
+    this.perfect = this.createAnimatedMarker(props.assets.perfect, judgeMs);
 
     this.node.addChild(
       this.marker,
