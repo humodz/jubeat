@@ -11,10 +11,10 @@ import { initTouch } from './touch';
 import { TouchPointers } from './TouchPointers';
 import { Assets, BeatMapStep, Song } from './types';
 
-interface InitPixiArgs {
+interface InitPixiProps {
   song: Song;
   beatMap: BeatMapStep[];
-  trackBlobUrl: string;
+  audio: HTMLAudioElement;
   assets: Assets;
   onScoreUpdate?: (score: number) => void;
   onFinish?: () => void;
@@ -22,11 +22,8 @@ interface InitPixiArgs {
 
 export function initPixi(
   pixi: PIXI.Application<HTMLCanvasElement>,
-  args: InitPixiArgs,
+  props: InitPixiProps,
 ) {
-  const audio = new Audio(args.trackBlobUrl);
-  audio.volume = args.song.track.volume;
-
   const scoreMap = {
     bad: 0.1,
     good: 0.4,
@@ -40,7 +37,7 @@ export function initPixi(
     buttonSize: BUTTON_SIZE,
     gridCols: GRID_COLS,
     gridRows: GRID_ROWS,
-    assets: args.assets,
+    assets: props.assets,
     onJudgement(judgement) {
       score += scoreMap[judgement];
     },
@@ -52,16 +49,16 @@ export function initPixi(
   pixi.stage.addChild(touchMarkers.node);
 
   const delaySecs = MARKER_DELAY_SECS;
-  const audioLagSecs = args.song.track.lagSeconds;
+  const audioLagSecs = props.song.track.lagSeconds;
 
   let nextIndex = 0;
   let elapsedSecs = -1;
   let score = 0;
   let audioStarted = false;
 
-  const endTime = last(args.beatMap).time + 2;
+  const endTime = last(props.beatMap).time + 2;
 
-  const maxScore = args.beatMap
+  const maxScore = props.beatMap
     .map((it) => it.taps.length)
     .reduce((a, b) => a + b, 0);
 
@@ -70,20 +67,20 @@ export function initPixi(
 
     if (elapsedSecs >= 0 && !audioStarted) {
       audioStarted = true;
-      audio.play();
+      props.audio.play();
     }
 
     if (elapsedSecs >= endTime) {
-      audio.pause();
+      props.audio.pause();
       pixi.ticker.stop();
-      args.onFinish?.();
+      props.onFinish?.();
     }
 
     while (
-      nextIndex < args.beatMap.length &&
-      elapsedSecs + delaySecs + audioLagSecs >= args.beatMap[nextIndex].time
+      nextIndex < props.beatMap.length &&
+      elapsedSecs + delaySecs + audioLagSecs >= props.beatMap[nextIndex].time
     ) {
-      for (const button of args.beatMap[nextIndex].taps) {
+      for (const button of props.beatMap[nextIndex].taps) {
         buttonPad.buttons[button].play();
       }
 
@@ -91,7 +88,7 @@ export function initPixi(
     }
 
     const realScore = Math.floor((1000000 * score) / maxScore);
-    args.onScoreUpdate?.(realScore);
+    props.onScoreUpdate?.(realScore);
 
     buttonPad.tick(touchList);
     touchMarkers.tick(touchList);

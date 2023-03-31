@@ -8,7 +8,7 @@ import styles from './styles.module.css';
 export interface GameSessionProps {
   song: Song;
   beatMap: BeatMap;
-  trackBlobUrl: string;
+  audio: HTMLAudioElement;
   assets: Assets;
   onFinish?: () => void;
 }
@@ -40,7 +40,7 @@ export function GameSession(props: GameSessionProps) {
     initPixi(pixi, {
       song: props.song,
       beatMap: props.beatMap.data,
-      trackBlobUrl: props.trackBlobUrl,
+      audio: props.audio,
       assets: props.assets,
       onScoreUpdate: setScore,
       onFinish: props.onFinish,

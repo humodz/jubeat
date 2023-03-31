@@ -29,3 +29,20 @@ export function last<T>(items: T[]): T {
 export function sleep(ms: number): Promise<void> {
   return new Promise((ok) => setTimeout(ok, ms));
 }
+
+export function lazyInit<T>(factory: () => T) {
+  let value: T;
+
+  return () => {
+    if (!value) {
+      value = factory();
+    }
+    return value;
+  };
+}
+
+export function waitEvent(target: EventTarget, event: string) {
+  return new Promise<void>((resolve) => {
+    target.addEventListener(event, () => resolve(), { once: true });
+  });
+}

@@ -27,12 +27,9 @@ export function App() {
   const dataQuery = useLoader(async () => {
     await sleep(2000);
 
-    const [trackBlobUrl, assets] = await Promise.all([
-      loadTrack(song),
-      loadAssets(),
-    ]);
+    const [audio, assets] = await Promise.all([loadTrack(song), loadAssets()]);
 
-    return { trackBlobUrl, assets };
+    return { audio, assets };
   });
 
   const [isStarted, setIsStarted] = useState(false);
@@ -45,7 +42,7 @@ export function App() {
     return <p>ERROR {dataQuery.error.message}</p>;
   }
 
-  const { trackBlobUrl, assets } = dataQuery.data;
+  const { audio, assets } = dataQuery.data;
 
   return (
     <>
@@ -56,7 +53,7 @@ export function App() {
         <GameSession
           song={song}
           beatMap={beatMap}
-          trackBlobUrl={trackBlobUrl}
+          audio={audio}
           assets={assets}
         />
       )}
