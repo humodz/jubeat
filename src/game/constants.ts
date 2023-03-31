@@ -6,7 +6,8 @@ export const GRID_COLS = 4;
 export const BUTTON_OUTLINE_THICKNESS = 0.05 * BUTTON_SIZE;
 export const BUTTON_OUTLINE_COLOR = 0x3399ff;
 
-export const TOUCH_MARKER_RADIUS = 0.05 * CANVAS_SIZE;
+export const TOUCH_RADIUS = 0.05 * CANVAS_SIZE;
+export const TOUCH_MARKER_RADIUS = TOUCH_RADIUS;
 export const TOUCH_MARKER_COLOR = 0xffffff;
 export const TOUCH_MARKER_ALPHA = 0.5;
 
@@ -15,3 +16,6 @@ export const MARKER_JUDGEMENT_DURATION_MS = 500;
 
 const markerDurationSecs = MARKER_DURATION_MS / 1000;
 export const MARKER_DELAY_SECS = (markerDurationSecs / 25) * 15;
+
+export const GAME_START_DELAY_SECONDS = 1;
+export const GAME_END_DELAY_SECONDS = 2;

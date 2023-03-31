@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GameSession } from './components/GameSession';
+import { GameComponent } from './components/GameComponent';
 import kimiWoNoseteData from './game-data/kimi-wo-nosete-6.beatmap.json';
 import kimiWoNosete from './game-data/kimi-wo-nosete.json';
 import { loadAssets } from './game/loaders/assets';
@@ -50,7 +50,7 @@ export function App() {
         <button onClick={() => setIsStarted(true)}>Start</button>
       </p>
       {isStarted && (
-        <GameSession
+        <GameComponent
           song={song}
           beatMap={beatMap}
           audio={audio}

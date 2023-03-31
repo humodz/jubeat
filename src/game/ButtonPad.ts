@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { range, repeat } from '../utils';
+import { TOUCH_RADIUS } from './constants';
 import { GameButton } from './GameButton';
 import { Point } from './types';
 
@@ -44,7 +45,7 @@ export class ButtonPad {
     const isPressed = repeat(this.buttons.length, () => false);
 
     for (const touch of touchPoints) {
-      const r = 10;
+      const r = TOUCH_RADIUS;
       this.checkIsTouched(isPressed, touch.x - r, touch.y - r);
       this.checkIsTouched(isPressed, touch.x - r, touch.y + r);
       this.checkIsTouched(isPressed, touch.x + r, touch.y - r);

@@ -1,11 +1,9 @@
-import * as PIXI from 'pixi.js';
 import { useEffect, useRef, useState } from 'react';
-import { CANVAS_SIZE } from '../../game/constants';
-import { initPixi } from '../../game/pixi';
+import { Game } from '../../game';
 import { Assets, BeatMap, Song } from '../../game/types';
 import styles from './styles.module.css';
 
-export interface GameSessionProps {
+export interface GameComponentProps {
   song: Song;
   beatMap: BeatMap;
   audio: HTMLAudioElement;
@@ -13,16 +11,11 @@ export interface GameSessionProps {
   onFinish?: () => void;
 }
 
-type PixiApp = PIXI.Application<HTMLCanvasElement>;
-const PixiApp = PIXI.Application<HTMLCanvasElement>;
-
-export function GameSession(props: GameSessionProps) {
+export function GameComponent(props: GameComponentProps) {
   const [score, setScore] = useState(0);
 
+  const gameRef = useRef<Game>();
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const pixiRef = useRef<PixiApp>();
-  const getPixi = () => pixiRef.current!;
 
   useEffect(() => {
     const element = containerRef.current;
@@ -31,13 +24,7 @@ export function GameSession(props: GameSessionProps) {
       return;
     }
 
-    const pixi = new PixiApp({ width: CANVAS_SIZE, height: CANVAS_SIZE });
-    pixiRef.current = pixi;
-
-    element.textContent = '';
-    element.append(pixi.view);
-
-    initPixi(pixi, {
+    const game = new Game({
       song: props.song,
       beatMap: props.beatMap.data,
       audio: props.audio,
@@ -46,15 +33,20 @@ export function GameSession(props: GameSessionProps) {
       onFinish: props.onFinish,
     });
 
-    return () => pixi.destroy();
+    gameRef.current = game;
+
+    element.textContent = '';
+    element.append(game.pixi.view);
+
+    return () => game.destroy();
   }, [props]);
 
   const pause = () => {
-    getPixi().ticker.stop();
+    gameRef.current?.pause();
   };
 
-  const unpause = () => {
-    getPixi().ticker.start();
+  const resume = () => {
+    gameRef.current?.resume();
   };
 
   if (!props.song || !props.beatMap) {
@@ -69,7 +61,7 @@ export function GameSession(props: GameSessionProps) {
       <div>
         {score}
         <button onClick={pause}>Pause</button>{' '}
-        <button onClick={unpause}>Unpause</button>
+        <button onClick={resume}>Unpause</button>
       </div>
       <div ref={containerRef} className={styles.canvasContainer}></div>
     </main>
