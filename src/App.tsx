@@ -57,6 +57,7 @@ export function App() {
           audio={audio}
           voices={voices}
           assets={assets}
+          onFinish={() => setIsStarted(false)}
         />
       )}
     </>

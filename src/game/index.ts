@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { last } from '../utils';
+import { sleep } from '../utils';
 import { ButtonPad } from './ButtonPad';
 import {
   BUTTON_SIZE,
@@ -44,18 +44,17 @@ export class Game {
   maxScore: number;
   nextIndex = 0;
   elapsedSecs = -GAME_START_DELAY_SECONDS;
-  endTime: number;
 
   constructor(public props: GameProps) {
     [this.buttonPad, this.touchPointers] = this.initGraphics();
     this.touchList = initTouch(this.pixi.view);
 
-    this.endTime = last(props.beatMap).time + GAME_END_DELAY_SECONDS;
     this.maxScore = props.beatMap
       .map((it) => it.taps.length)
       .reduce((a, b) => a + b, 0);
 
     this.pixi.ticker.add(() => this.onTick());
+    this.initAudio();
     this.pause();
   }
 
@@ -80,13 +79,16 @@ export class Game {
     return [buttonPad, touchPointers] as const;
   }
 
+  initAudio() {
+    this.props.audio.addEventListener('ended', () => this.onAudioEnd(), {
+      once: true,
+    });
+
+    this.props.audio.currentTime = 0;
+  }
+
   onTick() {
     const elapsedSecs = this.props.audio.currentTime;
-
-    if (elapsedSecs === this.props.audio.duration) {
-      this.pixi.ticker.stop();
-      this.props.onFinish?.();
-    }
 
     const realElapsedSecs =
       elapsedSecs + MARKER_DELAY_SECS + this.props.song.track.lagSeconds;
@@ -109,20 +111,25 @@ export class Game {
     this.touchPointers.tick(this.touchList);
   }
 
+  async onAudioEnd() {
+    await sleep(GAME_END_DELAY_SECONDS);
+    this.pixi.ticker.stop();
+    this.props.audio.pause();
+    this.props.onFinish?.();
+  }
+
   resume() {
-    // this.pixi.ticker.start();
-    this.props.audio.play();
     this.buttonPad.resume();
+    this.props.audio.play();
   }
 
   pause() {
-    // this.pixi.ticker.stop();
-    this.props.audio.pause();
     this.buttonPad.pause();
+    this.props.audio.pause();
   }
 
   destroy() {
-    this.props.audio.pause();
     this.pixi.destroy();
+    this.props.audio.pause();
   }
 }
