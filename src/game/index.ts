@@ -56,7 +56,7 @@ export class Game {
       .reduce((a, b) => a + b, 0);
 
     this.pixi.ticker.add(() => this.onTick());
-    this.resume();
+    this.pause();
   }
 
   initGraphics() {
@@ -109,16 +109,16 @@ export class Game {
     this.touchPointers.tick(this.touchList);
   }
 
-  pause() {
-    this.pixi.ticker.stop();
-    this.props.audio.pause();
-    this.buttonPad.pause();
-  }
-
   resume() {
-    this.pixi.ticker.start();
+    // this.pixi.ticker.start();
     this.props.audio.play();
     this.buttonPad.resume();
+  }
+
+  pause() {
+    // this.pixi.ticker.stop();
+    this.props.audio.pause();
+    this.buttonPad.pause();
   }
 
   destroy() {

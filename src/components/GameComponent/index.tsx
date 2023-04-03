@@ -1,6 +1,8 @@
+import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { Game } from '../../game';
-import { Assets, BeatMap, Song } from '../../game/types';
+import { Assets, BeatMap, Song, Voices } from '../../game/types';
+import { sleep } from '../../utils';
 import styles from './styles.module.css';
 
 export interface GameComponentProps {
@@ -8,10 +10,12 @@ export interface GameComponentProps {
   beatMap: BeatMap;
   audio: HTMLAudioElement;
   assets: Assets;
+  voices: Voices;
   onFinish?: () => void;
 }
 
 export function GameComponent(props: GameComponentProps) {
+  const [isAnimated, setIsAnimated] = useState(false);
   const [score, setScore] = useState(0);
 
   const gameRef = useRef<Game>();
@@ -41,11 +45,30 @@ export function GameComponent(props: GameComponentProps) {
     return () => game.destroy();
   }, [props]);
 
+  useEffect(() => {
+    async function run() {
+      await sleep(1000);
+      setIsAnimated(true);
+      props.voices.ready.play();
+
+      await sleep(1500);
+      props.voices.go.play();
+    }
+
+    run();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const pause = () => {
     gameRef.current?.pause();
   };
 
   const resume = () => {
+    gameRef.current?.resume();
+  };
+
+  const onAnimationEnd = () => {
     gameRef.current?.resume();
   };
 
@@ -61,9 +84,17 @@ export function GameComponent(props: GameComponentProps) {
       <div>{score}</div>
       <div>
         <button onClick={pause}>Pause</button>{' '}
-        <button onClick={resume}>Unpause</button>
+        <button onClick={resume}>Unpause</button>{' '}
       </div>
-      <div ref={containerRef} className={styles.canvasContainer}></div>
+      <div style={{ position: 'relative' }}>
+        <div ref={containerRef} className={styles.canvasContainer}></div>
+        <div className={styles.overlay}>
+          <div
+            className={clsx(styles.announcement, isAnimated && styles.readyGo)}
+            onAnimationEnd={onAnimationEnd}
+          ></div>
+        </div>
+      </div>
     </main>
   );
 }

@@ -41,3 +41,8 @@ export interface Assets {
   great: PIXI.Texture[];
   perfect: PIXI.Texture[];
 }
+
+export interface Voices {
+  ready: HTMLAudioElement;
+  go: HTMLAudioElement;
+}

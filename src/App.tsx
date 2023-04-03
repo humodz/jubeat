@@ -4,8 +4,8 @@ import kimiWoNoseteData from './game-data/kimi-wo-nosete-6.beatmap.json';
 import kimiWoNosete from './game-data/kimi-wo-nosete.json';
 import { loadAssets } from './game/loaders/assets';
 import { loadTrack } from './game/loaders/track';
+import { loadVoices } from './game/loaders/voices';
 import { Song } from './game/types';
-import { sleep } from './utils';
 import { useLoader } from './utils/hooks';
 
 const beatMap = {
@@ -25,11 +25,12 @@ const song: Song = {
 
 export function App() {
   const dataQuery = useLoader(async () => {
-    await sleep(2000);
-
-    const [audio, assets] = await Promise.all([loadTrack(song), loadAssets()]);
-
-    return { audio, assets };
+    const [audio, assets, voices] = await Promise.all([
+      loadTrack(song),
+      loadAssets(),
+      loadVoices(),
+    ]);
+    return { audio, assets, voices };
   });
 
   const [isStarted, setIsStarted] = useState(false);
@@ -42,7 +43,7 @@ export function App() {
     return <p>ERROR {dataQuery.error.message}</p>;
   }
 
-  const { audio, assets } = dataQuery.data;
+  const { audio, assets, voices } = dataQuery.data;
 
   return (
     <>
@@ -54,6 +55,7 @@ export function App() {
           song={song}
           beatMap={beatMap}
           audio={audio}
+          voices={voices}
           assets={assets}
         />
       )}
