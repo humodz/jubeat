@@ -5,25 +5,20 @@ import {
   MARKER_DURATION_MS,
   MARKER_JUDGEMENT_DURATION_MS,
 } from './constants';
+import { Assets } from './types';
 
 export interface GameButtonProps {
   size: number;
   x: number;
   y: number;
-
-  assets: {
-    marker: PIXI.Texture[];
-    bad: PIXI.Texture[];
-    good: PIXI.Texture[];
-    great: PIXI.Texture[];
-    perfect: PIXI.Texture[];
-  };
+  assets: Assets;
 }
 
 export class GameButton {
   node = new PIXI.Container();
   outline = new PIXI.Graphics();
 
+  startHere: PIXI.Sprite;
   marker: PIXI.AnimatedSprite;
   bad: PIXI.AnimatedSprite;
   good: PIXI.AnimatedSprite;
@@ -43,6 +38,11 @@ export class GameButton {
     const markerMs = MARKER_DURATION_MS;
     const judgeMs = MARKER_JUDGEMENT_DURATION_MS;
 
+    this.startHere = PIXI.Sprite.from(this.props.assets.startHere);
+    this.startHere.width = this.props.size;
+    this.startHere.height = this.props.size;
+    this.startHere.visible = false;
+
     this.marker = this.createAnimatedMarker(props.assets.marker, markerMs);
     this.bad = this.createAnimatedMarker(props.assets.bad, judgeMs);
     this.good = this.createAnimatedMarker(props.assets.good, judgeMs);
@@ -50,6 +50,7 @@ export class GameButton {
     this.perfect = this.createAnimatedMarker(props.assets.perfect, judgeMs);
 
     this.node.addChild(
+      this.startHere,
       this.marker,
       this.bad,
       this.good,
@@ -59,13 +60,26 @@ export class GameButton {
     );
   }
 
+  showStartHere(visible: boolean) {
+    this.startHere.visible = visible;
+  }
+
   showOutline(visible: boolean) {
     this.outline.visible = visible;
   }
 
   play() {
+    this.startHere.visible = false;
     this.marker.gotoAndPlay(0);
     this.marker.visible = true;
+  }
+
+  resume() {
+    this.marker.play();
+  }
+
+  pause() {
+    this.marker.stop();
   }
 
   press() {

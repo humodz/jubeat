@@ -44,7 +44,6 @@ export class Game {
   maxScore: number;
   nextIndex = 0;
   elapsedSecs = -GAME_START_DELAY_SECONDS;
-  audioStarted = false;
   endTime: number;
 
   constructor(public props: GameProps) {
@@ -55,9 +54,9 @@ export class Game {
     this.maxScore = props.beatMap
       .map((it) => it.taps.length)
       .reduce((a, b) => a + b, 0);
-    this.pixi.ticker.add(() => this.onTick());
 
-    console.log('!!!', this.props.audio.duration);
+    this.pixi.ticker.add(() => this.onTick());
+    this.resume();
   }
 
   initGraphics() {
@@ -71,6 +70,8 @@ export class Game {
       },
     });
 
+    buttonPad.startingMarkers(this.props.beatMap[0].taps);
+
     const touchPointers = new TouchPointers();
 
     this.pixi.stage.addChild(buttonPad.node);
@@ -80,11 +81,6 @@ export class Game {
   }
 
   onTick() {
-    if (!this.audioStarted) {
-      this.audioStarted = true;
-      this.props.audio.play();
-    }
-
     const elapsedSecs = this.props.audio.currentTime;
 
     if (elapsedSecs === this.props.audio.duration) {
@@ -114,11 +110,15 @@ export class Game {
   }
 
   pause() {
-    // TODO
+    this.pixi.ticker.stop();
+    this.props.audio.pause();
+    this.buttonPad.pause();
   }
 
   resume() {
-    // TODO
+    this.pixi.ticker.start();
+    this.props.audio.play();
+    this.buttonPad.resume();
   }
 
   destroy() {

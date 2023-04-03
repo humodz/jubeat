@@ -2,21 +2,14 @@ import * as PIXI from 'pixi.js';
 import { range, repeat } from '../utils';
 import { TOUCH_RADIUS } from './constants';
 import { GameButton } from './GameButton';
-import { Point } from './types';
+import { Assets, Point } from './types';
 
 export interface ButtonPadProps {
   buttonSize: number;
   gridRows: number;
   gridCols: number;
 
-  assets: {
-    marker: PIXI.Texture[];
-    bad: PIXI.Texture[];
-    good: PIXI.Texture[];
-    great: PIXI.Texture[];
-    perfect: PIXI.Texture[];
-  };
-
+  assets: Assets;
   onJudgement(judgement: 'bad' | 'good' | 'great' | 'perfect'): void;
 }
 
@@ -39,6 +32,24 @@ export class ButtonPad {
     this.pressedBefore = repeat(this.buttons.length, () => false);
 
     this.node.addChild(...this.buttons.map((it) => it.node));
+  }
+
+  startingMarkers(indices: number[]) {
+    for (const i of indices) {
+      this.buttons[i].showStartHere(true);
+    }
+  }
+
+  resume() {
+    for (const button of this.buttons) {
+      button.resume();
+    }
+  }
+
+  pause() {
+    for (const button of this.buttons) {
+      button.pause();
+    }
   }
 
   tick(touchPoints: Point[]) {

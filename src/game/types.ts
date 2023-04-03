@@ -34,6 +34,7 @@ export interface BeatMapStep {
   taps: number[];
 }
 export interface Assets {
+  startHere: PIXI.Texture;
   marker: PIXI.Texture[];
   bad: PIXI.Texture[];
   good: PIXI.Texture[];
