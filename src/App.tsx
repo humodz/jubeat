@@ -17,7 +17,7 @@ const song: Song = {
   ...kimiWoNosete,
   track: {
     url: '/game-data/kimi-wo-nosete.mp3',
-    volume: 0.25,
+    volume: 0.2,
     lagSeconds: 0.7,
   },
   beatMaps: {},
