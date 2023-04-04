@@ -1,3 +1,8 @@
+import { createHash } from 'crypto';
+import { existsSync } from 'fs';
+import { mkdir, readFile, writeFile } from 'fs/promises';
+import { dirname } from 'path';
+
 export function splitAt<T>(items: T[], splitFn: (it: T) => boolean): T[][] {
   const result: T[][] = [];
 
@@ -42,4 +47,41 @@ export function by<Item, Key>(
 
     return key1 < key2 ? -1 : key1 > key2 ? 1 : 0;
   };
+}
+
+export async function cache<T>(
+  path: string,
+  factory: () => Promise<T>,
+): Promise<T> {
+  if (existsSync(path)) {
+    const data = await readFile(path, 'utf-8');
+    return JSON.parse(data);
+  }
+
+  const dir = dirname(path);
+
+  await mkdir(dir, { recursive: true });
+
+  const data = await factory();
+  await writeFile(path, JSON.stringify(data));
+  return data;
+}
+
+export function asyncQueue() {
+  let lastPromise: Promise<unknown> = Promise.resolve();
+
+  return <T>(fn: () => Promise<T>): Promise<T> => {
+    const p = lastPromise.then(() => fn());
+    lastPromise = p;
+    return p;
+  };
+}
+
+export function hash(text: string) {
+  return createHash('md5').update(text).digest('hex');
+}
+
+export async function saveFile(name: string, content: string) {
+  await mkdir(dirname(name));
+  await writeFile(name, content);
 }

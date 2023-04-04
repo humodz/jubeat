@@ -4,7 +4,10 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "lib": [
-      "ESNext"
+      "ESNext",
+    ],
+    "types": [
+      "node"
     ],
     "allowJs": false,
     "resolveJsonModule": true,
