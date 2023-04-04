@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
+    "ts": "ts-node",
+    "ts-debug": "NODE_OPTIONS='--inspect-brk' ts-node",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\""

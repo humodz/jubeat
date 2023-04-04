@@ -1,12 +1,14 @@
-import axios from 'axios';
 import { load } from 'cheerio';
-import { join } from 'path';
-import { cache, hash } from './utils';
+import { fetchWithCache } from './utils';
 
 export const atWikiUrls = {
   songListArcade: 'https://w.atwiki.jp/cosmos_memo/pages/16.html',
   songListPlus: 'https://w.atwiki.jp/cosmos_memo/pages/551.html',
 };
+
+export type AtWikiSongInfo = Awaited<
+  ReturnType<typeof scrapeAtWikiSongList>
+>[number];
 
 export async function scrapeAtWikiSongList(url: string) {
   const html = await fetchPage(url);
@@ -71,10 +73,5 @@ export async function scrapeAtWikiSongList(url: string) {
 }
 
 async function fetchPage(url: string) {
-  const filePath = join('tmp/pages/atwiki', hash(url));
-
-  return await cache(filePath, async () => {
-    const response = await axios.get<string>(url, { responseType: 'text' });
-    return response.data;
-  });
+  return await fetchWithCache('tmp/pages/atwiki', url);
 }

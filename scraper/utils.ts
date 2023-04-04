@@ -1,7 +1,8 @@
+import axios from 'axios';
 import { createHash } from 'crypto';
 import { existsSync } from 'fs';
 import { mkdir, readFile, writeFile } from 'fs/promises';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 
 export function splitAt<T>(items: T[], splitFn: (it: T) => boolean): T[][] {
   const result: T[][] = [];
@@ -82,6 +83,15 @@ export function hash(text: string) {
 }
 
 export async function saveFile(name: string, content: string) {
-  await mkdir(dirname(name));
+  await mkdir(dirname(name), { recursive: true });
   await writeFile(name, content);
+}
+
+export async function fetchWithCache(cachePath: string, url: string) {
+  const filePath = join(cachePath, hash(url));
+
+  return await cache(filePath, async () => {
+    const response = await axios.get<string>(url);
+    return response.data;
+  });
 }

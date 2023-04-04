@@ -1,9 +1,11 @@
+import { readFileSync } from 'fs';
 import * as inquirer from 'inquirer';
-import { atWikiUrls, scrapeAtWikiSongList } from './atwiki';
+import { AtWikiSongInfo, atWikiUrls, scrapeAtWikiSongList } from './atwiki';
+import { scrapeAtWikiCosmosMemo } from './cosmos-memo';
 import { scrapeSongInfoFromRemyWiki } from './remywiki';
-import { saveFile } from './utils';
+import { hash, saveFile } from './utils';
 
-async function main() {
+async function main1() {
   const ui = new inquirer.ui.BottomBar();
   await inquirer.prompt([]);
 
@@ -43,4 +45,28 @@ async function main() {
   console.log('done');
 }
 
-main().catch(console.error);
+interface SongInfo {
+  atwiki: AtWikiSongInfo;
+}
+
+async function main2() {
+  const songList: SongInfo[] = JSON.parse(
+    readFileSync('tmp/result/song-list.json', 'utf-8'),
+  );
+
+  const beatMapUrls = songList
+    .flatMap((song) => song.atwiki.levels)
+    .flatMap((level) => level.beatMapUrl)
+    .filter((url): url is string => url !== null);
+
+  const firstUrl = beatMapUrls[0];
+
+  console.log(firstUrl);
+  const beatMap = await scrapeAtWikiCosmosMemo(firstUrl);
+
+  const filename = `tmp/result/beatmaps/${hash(firstUrl)}.beatmap.json`;
+  const data = JSON.stringify(beatMap, null, 2);
+  saveFile(filename, data);
+}
+
+main2().catch(console.error);

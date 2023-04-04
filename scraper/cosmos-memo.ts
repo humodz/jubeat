@@ -1,35 +1,28 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-import axios from 'axios';
-import { load as cheerioLoad } from 'cheerio';
-import * as fs from 'fs';
-import { by, enumerate, splitAt } from './utils';
+import { load } from 'cheerio';
+import { by, chunks, enumerate, fetchWithCache, splitAt } from './utils';
+
+export async function scrapeAtWikiCosmosMemo(url: string) {
+  const html = await fetchPage(url);
+  const $ = load(html);
+  const text = $('#wikibody').text().trim();
+  return await parse(text);
+}
+
+async function fetchPage(url: string) {
+  return await fetchWithCache('tmp/pages/atwiki-cosmos', url);
+}
 
 interface BeatMapStep {
   time: number;
   taps: number[];
 }
 
-async function main() {
-  await download();
-  await parse();
-}
+// TODO hold markers
+async function parse(data: string) {
+  const lines = data.split('\n').filter((it) => it);
 
-async function parse() {
-  const data = fs.readFileSync('tmp/kimi-wo-nosete.txt', 'utf-8');
-  const lines = data.split('\n');
-
-  const [
-    songName,
-    author,
-    ,
-    difficulty,
-    ,
-    levelRaw,
-    bpmRaw,
-    notesRaw,
-    ,
-    ...chartRaw
-  ] = lines;
+  const [title, artist, difficulty, levelRaw, bpmRaw, notesRaw, ...chartRaw] =
+    lines;
 
   const level = Number(levelRaw.split(' ').pop());
   const bpm = Number(bpmRaw.split(' ').pop());
@@ -46,7 +39,7 @@ async function parse() {
     const signToPosition: Record<string, number[]> = {};
     const signToBeat: Record<string, number> = {};
 
-    const screens = splitAt(page, (line) => line === '');
+    const screens = chunks(page, 4);
 
     for (const screen of screens) {
       for (const [row, y] of enumerate(screen)) {
@@ -86,20 +79,15 @@ async function parse() {
     }
   }
 
-  const song = { songName, author, difficulty, level, bpm, notes };
-  console.log(JSON.stringify(song, null, 2));
-  // console.log(JSON.stringify(beatMap, null, 2));
+  return {
+    meta: {
+      title,
+      artist,
+      difficulty,
+      level,
+      bpm,
+      notes,
+    },
+    data: beatMap,
+  };
 }
-
-async function download() {
-  const url = 'https://w.atwiki.jp/cosmos_memo/pages/522.html';
-  const response = await axios.get(url);
-
-  const $ = cheerioLoad(response.data);
-  const text = $('#wikibody p').text().trim();
-
-  fs.mkdirSync('tmp', { recursive: true });
-  fs.writeFileSync('tmp/kimi-wo-nosete.txt', text);
-}
-
-main().catch(console.error);

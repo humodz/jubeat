@@ -8,6 +8,10 @@ const urls = {
   searchSong: 'https://remywiki.com/index.php',
 };
 
+export type RemyWikiSongInfo = Awaited<
+  ReturnType<typeof scrapeSongInfoFromRemyWiki>
+>;
+
 export async function scrapeSongInfoFromRemyWiki(songName: string) {
   const altRegExp = /\s*\[\d+\]$/;
   const [altSuffix] = altRegExp.exec(songName) || [''];
