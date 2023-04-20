@@ -3,7 +3,7 @@ import * as inquirer from 'inquirer';
 import { AtWikiSongInfo, atWikiUrls, scrapeAtWikiSongList } from './atwiki';
 import { scrapeAtWikiCosmosMemo } from './cosmos-memo';
 import { scrapeSongInfoFromRemyWiki } from './remywiki';
-import { hash, saveFile } from './utils';
+import { hash, saveFile, saveJson } from './utils';
 
 async function main1() {
   const ui = new inquirer.ui.BottomBar();
@@ -33,15 +33,19 @@ async function main1() {
     }),
   );
 
-  const notFoundOnRemy = result.filter((it) => !it.remywiki).length;
+  const notFoundOnRemy = result.filter((it) => !it.remywiki);
 
   console.log({
     total: songList.length,
-    notFoundOnRemy,
+    notFoundOnRemy: notFoundOnRemy.length,
   });
 
-  const raw = JSON.stringify(result, null, 2);
-  await saveFile('tmp/result/song-list.json', raw);
+  const notFoundOnRemyTemplate = {
+    songs: notFoundOnRemy.map((song) => [song.atwiki.title, '']),
+  };
+
+  await saveJson('tmp/result/song-list.json', result);
+  await saveJson('tmp/result/not-found-on-remy.json', notFoundOnRemyTemplate);
   console.log('done');
 }
 
@@ -69,4 +73,4 @@ async function main2() {
   saveFile(filename, data);
 }
 
-main2().catch(console.error);
+main1().catch(console.error);

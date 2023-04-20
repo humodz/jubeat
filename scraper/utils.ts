@@ -54,6 +54,10 @@ export async function cache<T>(
   path: string,
   factory: () => Promise<T>,
 ): Promise<T> {
+  if (process.env.NO_CACHE === 'true') {
+    return await factory();
+  }
+
   if (existsSync(path)) {
     const data = await readFile(path, 'utf-8');
     return JSON.parse(data);
@@ -85,6 +89,11 @@ export function hash(text: string) {
 export async function saveFile(name: string, content: string) {
   await mkdir(dirname(name), { recursive: true });
   await writeFile(name, content);
+}
+
+export async function saveJson(name: string, content: unknown) {
+  await mkdir(dirname(name), { recursive: true });
+  await writeFile(name, JSON.stringify(content, null, 2));
 }
 
 export async function fetchWithCache(cachePath: string, url: string) {
