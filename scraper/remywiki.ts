@@ -13,14 +13,14 @@ export type RemyWikiSongInfo = Awaited<
 >;
 
 export async function scrapeSongInfoFromRemyWiki(
-  songName: string,
+  songTitle: string,
   fallbackUrl?: string,
 ) {
   const altRegExp = /\s*\[\d+\]$/;
-  const [altSuffix] = altRegExp.exec(songName) || [''];
+  const [altSuffix] = altRegExp.exec(songTitle) || [''];
 
   const html = await getRemyWikiPage(
-    songName.replace(altRegExp, ''),
+    songTitle.replace(altRegExp, ''),
     fallbackUrl,
   );
 
@@ -43,7 +43,7 @@ export async function scrapeSongInfoFromRemyWiki(
   };
 }
 
-export async function getRemyWikiPage(songName: string, fallbackUrl?: string) {
+export async function getRemyWikiPage(songTitle: string, fallbackUrl?: string) {
   if (fallbackUrl) {
     const filename = hash(fallbackUrl);
     return await cache(
@@ -54,15 +54,15 @@ export async function getRemyWikiPage(songName: string, fallbackUrl?: string) {
       },
     );
   } else {
-    return await searchRemyWiki(songName);
+    return await searchRemyWiki(songTitle);
   }
 }
 
-export async function searchRemyWiki(songName: string) {
+export async function searchRemyWiki(songTitle: string) {
   const url = new URL(urls.searchSong);
-  url.searchParams.set('search', songName);
+  url.searchParams.set('search', songTitle);
 
-  const filename = hash(songName);
+  const filename = hash(songTitle);
 
   return await cache(join(`tmp/pages/remywiki-search`, filename), async () => {
     const response = await axios.get<string>(url.toString());
@@ -71,28 +71,28 @@ export async function searchRemyWiki(songName: string) {
     const html = response.data;
 
     if (!responseUrl) {
-      throw new Error(`Response URL missing for ${songName}}`);
+      throw new Error(`Response URL missing for ${songTitle}}`);
     }
 
     const { pathname } = new URL(responseUrl);
 
     if (pathname === '/index.php') {
-      return await browseSearchResults(songName, html);
+      return await browseSearchResults(songTitle, html);
     }
 
     return html;
   });
 }
 
-function browseSearchResults(songName: string, html: string) {
+function browseSearchResults(songTitle: string, html: string) {
   const $ = load(html);
 
   const items = $('li.mw-search-result').filter((i, elem) => {
     const altTitle = $(elem).find('.searchalttitle').text().trim();
 
-    const isSection = noWs(altTitle).includes(noWs(`(section ${songName})`));
+    const isSection = noWs(altTitle).includes(noWs(`(section ${songTitle})`));
     const isRedirect = noWs(altTitle).includes(
-      noWs(`(redirect from ${songName})`),
+      noWs(`(redirect from ${songTitle})`),
     );
 
     return isSection || isRedirect;
