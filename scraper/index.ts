@@ -1,9 +1,19 @@
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import { Stream } from 'stream';
 import { scrapeBeatMaps, scrapeSongList, SongInfo } from './scraper';
-import { cache, hash, progress, saveIfNotExists } from './utils';
+import { cache, hash, last, progress, saveIfNotExists } from './utils';
 
 async function main() {
+  axiosRetry(axios, {
+    retries: 3,
+    shouldResetTimeout: true,
+    retryDelay(retryCount, error) {
+      console.error('[axios-retry]', error);
+      return 1000 * Math.pow(2, retryCount) * (1 + Math.random() / 5);
+    },
+  });
+
   const songs = await scrapeSongList();
 
   const songsWithBeatMaps = songs.filter((song) =>
@@ -34,7 +44,8 @@ export async function downloadJackets(songs: SongInfo[]) {
 }
 
 export async function downloadJacket(jacketUrl: string) {
-  const filename = `tmp/result/jackets/${hash(jacketUrl)}`;
+  const extension = last(jacketUrl.split('.'));
+  const filename = `tmp/result/jackets/${hash(jacketUrl)}.${extension}`;
 
   await saveIfNotExists(filename, async () => {
     const response = await axios.get<Stream>(jacketUrl, {
