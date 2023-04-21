@@ -35,7 +35,10 @@ export async function scrapeSongList(): Promise<SongInfo[]> {
   });
 
   const notFoundOnRemyTemplate = {
-    songs: notFoundOnRemy.map((song) => [song.atwiki.title, '']),
+    songs: notFoundOnRemy.map((song) => ({
+      title: song.atwiki.title,
+      url: '',
+    })),
   };
 
   await saveJson('tmp/result/song-list.json', songs);
