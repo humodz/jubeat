@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Stream } from 'stream';
 import { scrapeBeatMaps, scrapeSongList, SongInfo } from './scraper';
-import { cache, progress, saveIfNotExists } from './utils';
+import { cache, hash, progress, saveIfNotExists } from './utils';
 
 async function main() {
   const songs = await scrapeSongList();
@@ -34,7 +34,7 @@ export async function downloadJackets(songs: SongInfo[]) {
 }
 
 export async function downloadJacket(jacketUrl: string) {
-  const filename = `tmp/result/jackets/${encodeURIComponent(jacketUrl)}`;
+  const filename = `tmp/result/jackets/${hash(jacketUrl)}`;
 
   await saveIfNotExists(filename, async () => {
     const response = await axios.get<Stream>(jacketUrl, {

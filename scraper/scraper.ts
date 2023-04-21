@@ -1,7 +1,7 @@
 import { AtWikiSongInfo, atWikiUrls, scrapeAtWikiSongList } from './atwiki';
 import { scrapeAtWikiCosmosMemo } from './cosmos-memo';
 import { RemyWikiSongInfo, scrapeSongInfoFromRemyWiki } from './remywiki';
-import { cache, progress, saveJson } from './utils';
+import { cache, hash, progress, saveJson } from './utils';
 
 export interface SongInfo {
   atwiki: AtWikiSongInfo;
@@ -61,8 +61,8 @@ export async function scrapeBeatMapsForSong(song: SongInfo) {
 
   await Promise.all(
     beatMaps.map(async (beatMap) => {
-      const encodedUrl = encodeURIComponent(beatMap.meta.source);
-      await saveJson(`tmp/result/beatmaps/${encodedUrl}.beatmap.json`, beatMap);
+      const hashed = hash(beatMap.meta.source);
+      await saveJson(`tmp/result/beatmaps/${hashed}.beatmap.json`, beatMap);
     }),
   );
 }

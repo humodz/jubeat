@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { load } from 'cheerio';
+import { CheerioAPI, load } from 'cheerio';
 import { cache, hash } from './utils';
 
 const urls = {
@@ -31,14 +31,16 @@ export async function scrapeSongInfoFromRemyWiki(
 
   const titleOriginal = $('#mw-content-text h1 .mw-headline').text().trim();
   const titleRomaji = $('.mw-page-title-main').text().trim();
-  const jacketUrl = $('#mw-content-text .thumbinner img').first().attr('src');
 
   return {
     title: {
       original: titleOriginal + altSuffix,
       romaji: titleRomaji + altSuffix,
     },
-    jacketUrl: jacketUrl ? new URL(jacketUrl, urls.base).toString() : null,
+
+    // TODO fix it for https://remywiki.com/Morning_Glory
+    // it needs to parse the 1st line in the page "please see ..." and check the linked pages
+    jacketUrl: findJacketUrl($),
   };
 }
 
@@ -51,6 +53,40 @@ export async function getRemyWikiPage(songTitle: string, fallbackUrl?: string) {
     });
   } else {
     return await searchRemyWiki(songTitle);
+  }
+}
+
+export function findJacketUrl($: CheerioAPI): string | null {
+  const thumbnails = $('#mw-content-text .thumbinner');
+
+  function filterByCaptionMatches(regExp: RegExp) {
+    return thumbnails.filter((i, elem) => {
+      if (thumbnails.length === 1) {
+        return true;
+      }
+
+      const caption = $(elem).find('.thumbcaption').text().trim().toLowerCase();
+      return caption.match(regExp) !== null;
+    });
+  }
+
+  const captionHasJubeatJacket = filterByCaptionMatches(/jubeat jacket[.]?$/);
+  const captionHasJacket = filterByCaptionMatches(/jacket[.]?$/);
+
+  const allThumbs = [captionHasJubeatJacket, captionHasJacket, thumbnails];
+
+  const wantedThumbs = allThumbs.find((it) => it.length > 0);
+
+  if (!wantedThumbs) {
+    return null;
+  }
+
+  const rawUrl = wantedThumbs.find('img').first().attr('src');
+
+  if (rawUrl) {
+    return new URL(rawUrl, urls.base).toString();
+  } else {
+    return null;
   }
 }
 
