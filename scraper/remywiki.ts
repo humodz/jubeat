@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { load } from 'cheerio';
-import { join } from 'path';
 import { cache, hash } from './utils';
 
 const urls = {
@@ -46,13 +45,10 @@ export async function scrapeSongInfoFromRemyWiki(
 export async function getRemyWikiPage(songTitle: string, fallbackUrl?: string) {
   if (fallbackUrl) {
     const filename = hash(fallbackUrl);
-    return await cache(
-      join(`tmp/pages/remywiki-fallback`, filename),
-      async () => {
-        const response = await axios.get<string>(fallbackUrl);
-        return response.data;
-      },
-    );
+    return await cache(`tmp/pages/remywiki-fallback/${filename}`, async () => {
+      const response = await axios.get<string>(fallbackUrl);
+      return response.data;
+    });
   } else {
     return await searchRemyWiki(songTitle);
   }
@@ -64,7 +60,7 @@ export async function searchRemyWiki(songTitle: string) {
 
   const filename = hash(songTitle);
 
-  return await cache(join(`tmp/pages/remywiki-search`, filename), async () => {
+  return await cache(`tmp/pages/remywiki-search/${filename}`, async () => {
     const response = await axios.get<string>(url.toString());
 
     const { responseUrl } = response.request?.res;

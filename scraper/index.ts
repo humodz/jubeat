@@ -1,76 +1,48 @@
-import { readFileSync } from 'fs';
-import * as inquirer from 'inquirer';
-import { AtWikiSongInfo, atWikiUrls, scrapeAtWikiSongList } from './atwiki';
-import { scrapeAtWikiCosmosMemo } from './cosmos-memo';
-import { scrapeSongInfoFromRemyWiki } from './remywiki';
-import { hash, saveFile, saveJson } from './utils';
+import axios from 'axios';
+import { Stream } from 'stream';
+import { scrapeBeatMaps, scrapeSongList, SongInfo } from './scraper';
+import { cache, progress, saveIfNotExists } from './utils';
 
-async function main1() {
-  const ui = new inquirer.ui.BottomBar();
-  await inquirer.prompt([]);
+async function main() {
+  const songs = await scrapeSongList();
 
-  const [arcadeSongs, plusSongs] = await Promise.all([
-    scrapeAtWikiSongList(atWikiUrls.songListArcade),
-    scrapeAtWikiSongList(atWikiUrls.songListPlus),
-  ]);
-
-  const songList = [...arcadeSongs, ...plusSongs];
-
-  let done = 0;
-
-  const result = await Promise.all(
-    songList.map(async (song) => {
-      const remywikiData = await scrapeSongInfoFromRemyWiki(song.title);
-
-      done += 1;
-
-      ui.updateBottomBar(`Progress: ${done} / ${songList.length} `);
-
-      return {
-        atwiki: song,
-        remywiki: remywikiData,
-      };
-    }),
+  const songsWithBeatMaps = songs.filter((song) =>
+    song.atwiki.levels.some((level) => level.beatMapUrl !== null),
   );
 
-  const notFoundOnRemy = result.filter((it) => !it.remywiki);
+  console.log({ songsWithBeatMaps: songsWithBeatMaps.length });
 
-  console.log({
-    total: songList.length,
-    notFoundOnRemy: notFoundOnRemy.length,
+  await cache('tmp/data/beatmaps-done.json', async () => {
+    await scrapeBeatMaps(songsWithBeatMaps);
+    return 'done';
   });
 
-  const notFoundOnRemyTemplate = {
-    songs: notFoundOnRemy.map((song) => [song.atwiki.title, '']),
-  };
+  const songsWithJacket = songs.filter((song) => song.remywiki?.jacketUrl);
+  console.log({ songsWithJacket: songsWithJacket.length });
 
-  await saveJson('tmp/result/song-list.json', result);
-  await saveJson('tmp/result/not-found-on-remy.json', notFoundOnRemyTemplate);
-  console.log('done');
+  await downloadJackets(songsWithJacket);
 }
 
-interface SongInfo {
-  atwiki: AtWikiSongInfo;
+export async function downloadJackets(songs: SongInfo[]) {
+  await progress('[downloadJackets]', songs, async (song) => {
+    const url = song.remywiki?.jacketUrl;
+
+    if (url) {
+      return await downloadJacket(url);
+    }
+  });
 }
 
-async function main2() {
-  const songList: SongInfo[] = JSON.parse(
-    readFileSync('tmp/result/song-list.json', 'utf-8'),
-  );
+export async function downloadJacket(jacketUrl: string) {
+  const filename = `tmp/result/jackets/${encodeURIComponent(jacketUrl)}`;
 
-  const beatMapUrls = songList
-    .flatMap((song) => song.atwiki.levels)
-    .flatMap((level) => level.beatMapUrl)
-    .filter((url): url is string => url !== null);
+  await saveIfNotExists(filename, async () => {
+    const response = await axios.get<Stream>(jacketUrl, {
+      responseType: 'stream',
+    });
 
-  const firstUrl = beatMapUrls[0];
-
-  console.log(firstUrl);
-  const beatMap = await scrapeAtWikiCosmosMemo(firstUrl);
-
-  const filename = `tmp/result/beatmaps/${hash(firstUrl)}.beatmap.json`;
-  const data = JSON.stringify(beatMap, null, 2);
-  saveFile(filename, data);
+    return response.data;
+  });
 }
 
-main1().catch(console.error);
+main().catch(console.error);

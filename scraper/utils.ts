@@ -2,7 +2,9 @@ import axios from 'axios';
 import { createHash } from 'crypto';
 import { existsSync } from 'fs';
 import { mkdir, readFile, writeFile } from 'fs/promises';
+import * as inquirer from 'inquirer';
 import { dirname, join } from 'path';
+import { Stream } from 'stream';
 
 export function splitAt<T>(items: T[], splitFn: (it: T) => boolean): T[][] {
   const result: T[][] = [];
@@ -72,6 +74,27 @@ export async function cache<T>(
   return data;
 }
 
+export async function saveIfNotExists(
+  path: string,
+  factory: () => Promise<string | Buffer | Stream>,
+) {
+  if (process.env.NO_CACHE === 'true') {
+    await factory();
+  }
+
+  if (existsSync(path)) {
+    return;
+  }
+
+  const dir = dirname(path);
+
+  await mkdir(dir, { recursive: true });
+
+  const data = await factory();
+  await writeFile(path, data);
+  return data;
+}
+
 export function asyncQueue() {
   let lastPromise: Promise<unknown> = Promise.resolve();
 
@@ -86,7 +109,11 @@ export function hash(text: string) {
   return createHash('md5').update(text).digest('hex');
 }
 
-export async function saveFile(name: string, content: string) {
+export function last<T>(items: T[]): T {
+  return items[items.length - 1];
+}
+
+export async function saveFile(name: string, content: string | Stream) {
   await mkdir(dirname(name), { recursive: true });
   await writeFile(name, content);
 }
@@ -103,4 +130,25 @@ export async function fetchWithCache(cachePath: string, url: string) {
     const response = await axios.get<string>(url);
     return response.data;
   });
+}
+
+export async function progress<T, R>(
+  title: string,
+  items: T[],
+  process: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const ui = new inquirer.ui.BottomBar();
+  await inquirer.prompt([]);
+  let done = 0;
+
+  ui.updateBottomBar(`${title} ${done} / ${items.length} `);
+
+  return await Promise.all(
+    items.map(async (item) => {
+      const result = await process(item);
+      done += 1;
+      ui.updateBottomBar(`${title} ${done} / ${items.length} `);
+      return result;
+    }),
+  );
 }

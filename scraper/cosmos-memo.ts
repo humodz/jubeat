@@ -5,7 +5,7 @@ export async function scrapeAtWikiCosmosMemo(url: string) {
   const html = await fetchPage(url);
   const $ = load(html);
   const text = $('#wikibody').text().trim();
-  return await parse(text);
+  return await parse(url, text);
 }
 
 async function fetchPage(url: string) {
@@ -18,7 +18,7 @@ interface BeatMapStep {
 }
 
 // TODO hold markers
-async function parse(data: string) {
+async function parse(source: string, data: string) {
   const lines = data.split('\n').filter((it) => it);
 
   const [title, artist, difficulty, levelRaw, bpmRaw, notesRaw, ...chartRaw] =
@@ -81,6 +81,7 @@ async function parse(data: string) {
 
   return {
     meta: {
+      source,
       title,
       artist,
       difficulty,
