@@ -1,8 +1,14 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { Stream } from 'stream';
-import { scrapeBeatMaps, scrapeSongList, SongInfo } from './scraper';
-import { cache, hash, last, progress, saveIfNotExists } from './utils';
+import {
+  downloadJackets,
+  getBeatMapFilename,
+  getJacketFilename,
+  scrapeBeatMaps,
+  scrapeSongList,
+  SongInfo,
+} from './scraper';
+import { cache, hash, saveJson } from './utils';
 
 async function main() {
   axiosRetry(axios, {
@@ -31,29 +37,52 @@ async function main() {
   console.log({ songsWithJacket: songsWithJacket.length });
 
   await downloadJackets(songsWithJacket);
+
+  const finalData = songs.map((song) => {
+    return {
+      id: getSongId(song),
+      title: {
+        original: song.atwiki.title,
+        romaji: song.remywiki?.title ?? null,
+      },
+      artist: song.atwiki.artist,
+      bpm: song.atwiki.bpm,
+      jacketUrl: getJacketUrl(song.remywiki?.jacketUrl),
+      levels: song.atwiki.levels.map((level) => ({
+        ...level,
+        beatMapUrl: getBeatMapUrl(level.beatMapUrl),
+      })),
+    };
+  });
+
+  saveJson('tmp/result/songs.json', finalData);
 }
 
-export async function downloadJackets(songs: SongInfo[]) {
-  await progress('[downloadJackets]', songs, async (song) => {
-    const url = song.remywiki?.jacketUrl;
-
-    if (url) {
-      return await downloadJacket(url);
-    }
-  });
+function getSongId(song: SongInfo) {
+  return hash(
+    [
+      song.atwiki.bpm,
+      ...song.atwiki.levels.map((level) => [
+        level.level,
+        level.difficulty,
+        level.notes,
+      ]),
+    ].join('#'),
+  );
 }
 
-export async function downloadJacket(jacketUrl: string) {
-  const extension = last(jacketUrl.split('.'));
-  const filename = `tmp/result/jackets/${hash(jacketUrl)}.${extension}`;
+function getJacketUrl(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+  return 'game-data/jackets/' + getJacketFilename(url);
+}
 
-  await saveIfNotExists(filename, async () => {
-    const response = await axios.get<Stream>(jacketUrl, {
-      responseType: 'stream',
-    });
-
-    return response.data;
-  });
+function getBeatMapUrl(url: string | null) {
+  if (!url) {
+    return null;
+  }
+  return 'game-data/beatmaps/' + getBeatMapFilename(url);
 }
 
 main().catch(console.error);

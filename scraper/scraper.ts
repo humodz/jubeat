@@ -1,7 +1,16 @@
+import axios from 'axios';
+import { Stream } from 'stream';
 import { AtWikiSongInfo, atWikiUrls, scrapeAtWikiSongList } from './atwiki';
 import { scrapeAtWikiCosmosMemo } from './cosmos-memo';
 import { RemyWikiSongInfo, scrapeSongInfoFromRemyWiki } from './remywiki';
-import { cache, hash, progress, saveJson } from './utils';
+import {
+  cache,
+  hash,
+  last,
+  progress,
+  saveIfNotExists,
+  saveJson,
+} from './utils';
 
 export interface SongInfo {
   atwiki: AtWikiSongInfo;
@@ -41,7 +50,7 @@ export async function scrapeSongList(): Promise<SongInfo[]> {
     })),
   };
 
-  await saveJson('tmp/result/song-list.json', songs);
+  await saveJson('tmp/result/song-list-original.json', songs);
   await saveJson('tmp/result/not-found-on-remy.json', notFoundOnRemyTemplate);
 
   return songs;
@@ -64,8 +73,40 @@ export async function scrapeBeatMapsForSong(song: SongInfo) {
 
   await Promise.all(
     beatMaps.map(async (beatMap) => {
-      const hashed = hash(beatMap.meta.source);
-      await saveJson(`tmp/result/beatmaps/${hashed}.beatmap.json`, beatMap);
+      const filename = getBeatMapFilename(beatMap.meta.source);
+      await saveJson(`tmp/result/beatmaps/${filename}`, beatMap);
     }),
   );
+}
+
+export function getBeatMapFilename(beatMapUrl: string) {
+  const hashed = hash(beatMapUrl);
+  return `${hashed}.beatmap.json`;
+}
+
+export async function downloadJackets(songs: SongInfo[]) {
+  await progress('[downloadJackets]', songs, async (song) => {
+    const url = song.remywiki?.jacketUrl;
+
+    if (url) {
+      return await downloadJacket(url);
+    }
+  });
+}
+
+export async function downloadJacket(jacketUrl: string) {
+  const filename = `tmp/result/jackets/${getJacketFilename(jacketUrl)}`;
+
+  await saveIfNotExists(filename, async () => {
+    const response = await axios.get<Stream>(jacketUrl, {
+      responseType: 'stream',
+    });
+
+    return response.data;
+  });
+}
+
+export function getJacketFilename(jacketUrl: string) {
+  const extension = last(jacketUrl.split('.'));
+  return `${hash(jacketUrl)}.${extension}`;
 }
