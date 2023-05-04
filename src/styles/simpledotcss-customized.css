@@ -417,7 +417,7 @@ img,
 video {
   max-width: 100%;
   height: auto;
-  border-radius: var(--standard-border-radius);
+  /* border-radius: var(--standard-border-radius); */
 }
 
 figure {

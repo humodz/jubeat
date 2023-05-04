@@ -1,0 +1,19 @@
+.songSummary {
+  display: flex;
+  margin: 0.5rem 0;
+}
+
+.jacket {
+  height: 5rem;
+  width: 5rem;
+  background-color: #000;
+  flex-shrink: 0;
+}
+
+.details {
+  margin-left: 0.5rem;
+}
+
+.details p {
+  text-overflow: ellipsis;
+}

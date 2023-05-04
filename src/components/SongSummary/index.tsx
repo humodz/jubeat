@@ -1,24 +1,24 @@
-import { Level, Song } from '../../game/types';
+import { SongInfo } from '../../types';
+import styles from './styles.module.css';
 
 interface SongSummaryProps {
-  song: Song;
-  onPlay?: (level: Level) => void;
+  song: SongInfo;
 }
 
 export function SongSummary(props: SongSummaryProps) {
+  const { song } = props;
+
+  const blank =
+    'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+  const jacketUrl = song.jacketUrl || blank;
+  const title = song.title.romaji || song.title.original;
+
   return (
-    <div>
-      <p>
-        <strong>{props.song.songName}</strong>
-      </p>
-      {Object.entries(props.song.beatMaps).map(
-        ([level, beatMap]) =>
-          beatMap && (
-            <div key={level} onClick={() => props.onPlay?.(level as Level)}>
-              {level}: {beatMap.difficulty}
-            </div>
-          ),
-      )}
+    <div className={styles.songSummary}>
+      <img className={styles.jacket} src={jacketUrl} alt={`${title} jacket`} />
+      <div className={styles.details}>
+        <p>{title}</p>
+      </div>
     </div>
   );
 }

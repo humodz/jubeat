@@ -1,29 +1,46 @@
 import { useState } from 'react';
 import { GameComponent } from './components/GameComponent';
-import kimiWoNoseteData from './game-data/kimi-wo-nosete-6.beatmap.json';
-import kimiWoNosete from './game-data/kimi-wo-nosete.json';
+import { SongSummary } from './components/SongSummary';
 import { loadAssets } from './game/loaders/assets';
 import { loadTrack } from './game/loaders/track';
 import { loadVoices } from './game/loaders/voices';
-import { Song } from './game/types';
+import { SongInfo } from './types';
 import { useLoader } from './utils/hooks';
 
-const beatMap = {
-  difficulty: 6,
-  data: kimiWoNoseteData,
-};
-
-const song: Song = {
-  ...kimiWoNosete,
-  track: {
-    url: '/game-data/kimi-wo-nosete.mp3',
-    volume: 0.2,
-    lagSeconds: 0.7,
-  },
-  beatMaps: {},
+const trackData = {
+  lagSeconds: 0.7,
+  volume: 0.2,
 };
 
 export function App() {
+  const songsQuery = useLoader(async () => {
+    const response = await fetch('game-data/songs.json');
+    return (await response.json()) as SongInfo[];
+  });
+
+  if (songsQuery.status === 'loading') {
+    return <p>Loading...</p>;
+  }
+
+  if (songsQuery.status === 'error') {
+    return <p>ERROR {songsQuery.error.message}</p>;
+  }
+
+  const songs = songsQuery.data;
+
+  return (
+    <>
+      {songs.map((song) => (
+        <SongSummary key={song.id} song={song} />
+      ))}
+    </>
+  );
+}
+
+export function App2() {
+  const song: any = null;
+  const beatMap: any = null;
+
   const dataQuery = useLoader(async () => {
     const [audio, assets, voices] = await Promise.all([
       loadTrack(song),

@@ -37,13 +37,14 @@ async function main() {
   console.log({ songsWithJacket: songsWithJacket.length });
 
   await downloadJackets(songsWithJacket);
+  console.log();
 
   const finalData = songs.map((song) => {
     return {
       id: getSongId(song),
       title: {
         original: song.atwiki.title,
-        romaji: song.remywiki?.title ?? null,
+        romaji: song.remywiki?.title.romaji ?? null,
       },
       artist: song.atwiki.artist,
       bpm: song.atwiki.bpm,
