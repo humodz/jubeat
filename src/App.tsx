@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { SongDetailsScreen } from './screens/SongDetailsScreen';
 import { SongSelectScreen } from './screens/SongSelectScreen';
-import { SongInfo } from './types';
+import { SongInfo, SongLevel } from './types';
 
 const trackData = {
   lagSeconds: 0.7,
@@ -9,7 +10,8 @@ const trackData = {
 
 type Screen =
   | { type: 'song-select' }
-  | { type: 'song-details'; song: SongInfo };
+  | { type: 'song-details'; song: SongInfo }
+  | { type: 'game'; song: SongInfo; level: SongLevel };
 
 export function App() {
   const [screen, setScreen] = useState<Screen>({ type: 'song-select' });
@@ -25,10 +27,25 @@ export function App() {
   } else if (screen.type === 'song-details') {
     return (
       <>
-        <p>Song Details</p>
-        <pre>
-          <code>{JSON.stringify(screen.song, null, 2)}</code>
-        </pre>
+        <SongDetailsScreen
+          song={screen.song}
+          onBack={() => setScreen({ type: 'song-select' })}
+          onSelectLevel={(level) =>
+            setScreen({ type: 'game', song: screen.song, level })
+          }
+        />
+      </>
+    );
+  } else if (screen.type === 'game') {
+    return (
+      <>
+        <p>Game</p>
+
+        <div>
+          <pre>
+            <code>{JSON.stringify(screen, null, 2)}</code>
+          </pre>
+        </div>
       </>
     );
   }

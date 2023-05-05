@@ -46,3 +46,26 @@ export function waitEvent(target: EventTarget, event: string) {
     target.addEventListener(event, () => resolve(), { once: true });
   });
 }
+
+export function by<Item, Key>(
+  getAttribute: (item: Item) => Key,
+  compare: (key1: Key, key2: Key) => number = (key1, key2) =>
+    key1 < key2 ? -1 : key1 > key2 ? 1 : 0,
+): (item1: Item, item2: Item) => number {
+  return (item1, item2) => {
+    const key1 = getAttribute(item1);
+    const key2 = getAttribute(item2);
+
+    return compare(key1, key2);
+  };
+}
+
+const collator = new Intl.Collator(undefined, {
+  numeric: true,
+  ignorePunctuation: true,
+  usage: 'sort',
+  sensitivity: 'base',
+});
+
+export const intlCompare = (key1: string, key2: string) =>
+  collator.compare(key1, key2);

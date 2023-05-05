@@ -4,6 +4,7 @@ import { ChangeEvent, useMemo, useState } from 'react';
 import { SearchInput } from '../../components/SearchInput';
 import { SongSummary } from '../../components/SongSummary';
 import { SongInfo } from '../../types';
+import { by, intlCompare } from '../../utils';
 import { useLoader } from '../../utils/hooks';
 
 interface SongSelectScreenProps {
@@ -46,7 +47,11 @@ export function SongSelectScreen(props: SongSelectScreenProps) {
 function useSongSearch(searchTerm: string) {
   const songsQuery = useLoader(async () => {
     const response = await fetch('game-data/songs.json');
-    return (await response.json()) as SongInfo[];
+    const allSongs = (await response.json()) as SongInfo[];
+
+    return allSongs
+      .filter((song) => song.levels.some((level) => level.beatMapUrl !== null))
+      .sort(by((it) => it.title.romaji || it.title.original, intlCompare));
   });
 
   const fuse = useMemo(() => {
