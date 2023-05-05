@@ -32,20 +32,24 @@
 .level {
   font-size: 0.8em;
   display: inline-block;
-  background-color: var(--level-color, #767A7F);
+  background-color: var(--level-color, #AE328F);
   border-radius: 3px;
   padding: 0 0.25rem;
   margin-right: 0.5rem;
 }
 
-[data-difficulty=BAS] {
+.level[data-difficulty=BAS] {
   --level-color: #7A9D2F;
 }
 
-[data-difficulty=ADV] {
+.level[data-difficulty=ADV] {
   --level-color: #0096E0;
 }
 
-[data-difficulty=EXT] {
+.level[data-difficulty=EXT] {
   --level-color: #E00000;
+}
+
+.level[data-unavailable=true] {
+  --level-color: #767A7F;
 }

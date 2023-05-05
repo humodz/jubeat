@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 type Status = 'loading' | 'success' | 'error';
 
-type LoaderResult<T> =
+export type LoaderResult<T> =
   | { status: 'loading' }
   | { status: 'success'; data: T }
   | { status: 'error'; error: any };

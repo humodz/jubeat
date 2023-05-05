@@ -1,5 +1,5 @@
 #root {
-  max-width: 480px;
+  max-width: min(480px, 100vw - 1rem);
   margin: auto;
   user-select: none;
 }
