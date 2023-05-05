@@ -4,16 +4,48 @@
 }
 
 .jacket {
-  height: 5rem;
-  width: 5rem;
   background-color: #000;
   flex-shrink: 0;
+  height: 80px;
+  width: 80px;
 }
 
 .details {
   margin-left: 0.5rem;
+  overflow-x: hidden;
 }
 
-.details p {
+.title {
   text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.artist {
+  font-size: 0.6em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+
+.level {
+  font-size: 0.8em;
+  display: inline-block;
+  background-color: var(--level-color, #767A7F);
+  border-radius: 3px;
+  padding: 0 0.25rem;
+  margin-right: 0.5rem;
+}
+
+[data-difficulty=BAS] {
+  --level-color: #7A9D2F;
+}
+
+[data-difficulty=ADV] {
+  --level-color: #0096E0;
+}
+
+[data-difficulty=EXT] {
+  --level-color: #E00000;
 }

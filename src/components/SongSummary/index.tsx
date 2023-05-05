@@ -17,7 +17,20 @@ export function SongSummary(props: SongSummaryProps) {
     <div className={styles.songSummary}>
       <img className={styles.jacket} src={jacketUrl} alt={`${title} jacket`} />
       <div className={styles.details}>
-        <p>{title}</p>
+        <div className={styles.title}>{title}</div>
+        <div className={styles.artist}>{song.artist}</div>
+
+        <div>
+          {song.levels.map((level) => (
+            <div
+              key={level.difficulty}
+              className={styles.level}
+              data-difficulty={level.difficulty}
+            >
+              {level.difficulty} | {level.level}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

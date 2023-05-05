@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import Fuse from 'fuse.js';
+import debounce from 'lodash/debounce';
+import { ChangeEvent, useMemo, useState } from 'react';
 import { GameComponent } from './components/GameComponent';
+import { SearchInput } from './components/SearchInput';
 import { SongSummary } from './components/SongSummary';
 import { loadAssets } from './game/loaders/assets';
 import { loadTrack } from './game/loaders/track';
@@ -13,10 +16,40 @@ const trackData = {
 };
 
 export function App() {
+  const [searchTerm, setSearchTerm] = useState('');
+
   const songsQuery = useLoader(async () => {
     const response = await fetch('game-data/songs.json');
     return (await response.json()) as SongInfo[];
   });
+
+  const fuse = useMemo(() => {
+    if (songsQuery.status !== 'success') {
+      return new Fuse([]);
+    } else {
+      return new Fuse(songsQuery.data, {
+        keys: ['title.romaji', 'title.original'],
+      });
+    }
+  }, [songsQuery]);
+
+  const onInputChange = useMemo(() => {
+    return debounce((event: ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value.trim());
+    }, 300);
+  }, []);
+
+  const songsToShow = useMemo(() => {
+    if (songsQuery.status !== 'success') {
+      return [];
+    }
+
+    if (!searchTerm) {
+      return songsQuery.data;
+    }
+
+    return fuse.search(searchTerm).map((it) => it.item);
+  }, [fuse, searchTerm, songsQuery]);
 
   if (songsQuery.status === 'loading') {
     return <p>Loading...</p>;
@@ -26,11 +59,10 @@ export function App() {
     return <p>ERROR {songsQuery.error.message}</p>;
   }
 
-  const songs = songsQuery.data;
-
   return (
     <>
-      {songs.map((song) => (
+      <SearchInput onChange={onInputChange} />
+      {songsToShow.slice(0, 10).map((song) => (
         <SongSummary key={song.id} song={song} />
       ))}
     </>
