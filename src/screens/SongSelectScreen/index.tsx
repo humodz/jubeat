@@ -83,6 +83,7 @@ async function getSongs() {
   return allSongs
     .filter((song) => song.levels.some((level) => level.beatMapUrl !== null))
     .map((song) => ({ ...song, track: trackMap[song.id] }))
+    .filter((song) => song.track)
     .sort(by((it) => it.title.romaji || it.title.original, intlCompare));
 }
 

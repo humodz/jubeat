@@ -64,6 +64,7 @@
 .level {
   font-size: 0.8em;
   display: inline-block;
+  font-weight: bold;
   background-color: var(--level-color, #AE328F);
   border-radius: 3px;
   padding: 0 0.25rem;
@@ -71,11 +72,11 @@
 }
 
 .level[data-difficulty=BAS] {
-  --level-color: #7A9D2F;
+  --level-color: #3b990f;
 }
 
 .level[data-difficulty=ADV] {
-  --level-color: #0096E0;
+  --level-color: #df9100;
 }
 
 .level[data-difficulty=EXT] {
