@@ -4,14 +4,6 @@ export interface Point {
   x: number;
   y: number;
 }
-
-export interface Song {
-  songName: string;
-  author: string;
-  track: Track;
-  beatMaps: Partial<Record<Level, BeatMap | null>>;
-}
-
 export interface Track {
   url: string;
   volume: number;

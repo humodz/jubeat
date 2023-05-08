@@ -4,7 +4,7 @@ import { ChangeEvent, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { SearchInput } from '../../components/SearchInput';
 import { SongSummary } from '../../components/SongSummary';
-import { SongInfo } from '../../types';
+import { SongInfo, SongTrack } from '../../types';
 import { by, fetchJson, intlCompare } from '../../utils';
 
 interface SongSelectScreenProps {
@@ -75,12 +75,14 @@ function useSongSearch(searchTerm: string) {
 async function getSongs() {
   const [allSongs, trackMap] = await Promise.all([
     fetchJson<SongInfo[]>('game-data/songs.json'),
-    fetchJson<Record<string, string>>('game-data/track-map.json'),
+    fetchJson<Record<string, SongTrack | undefined>>(
+      'game-data/track-map.json',
+    ),
   ]);
 
   return allSongs
     .filter((song) => song.levels.some((level) => level.beatMapUrl !== null))
-    .map((song) => ({ ...song, trackUrl: trackMap[song.id] }))
+    .map((song) => ({ ...song, track: trackMap[song.id] }))
     .sort(by((it) => it.title.romaji || it.title.original, intlCompare));
 }
 

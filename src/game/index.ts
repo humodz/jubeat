@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { SongInfo } from '../types';
 import { sleep } from '../utils';
 import { ButtonPad } from './ButtonPad';
 import {
@@ -12,10 +13,10 @@ import {
 } from './constants';
 import { initTouch } from './touch';
 import { TouchPointers } from './TouchPointers';
-import { Assets, BeatMapStep, Point, Song } from './types';
+import { Assets, BeatMapStep, Point } from './types';
 
 interface GameProps {
-  song: Song;
+  song: SongInfo;
   beatMap: BeatMapStep[];
   audio: HTMLAudioElement;
   assets: Assets;
@@ -91,7 +92,9 @@ export class Game {
     const elapsedSecs = this.props.audio.currentTime;
 
     const realElapsedSecs =
-      elapsedSecs + MARKER_DELAY_SECS + this.props.song.track.lagSeconds;
+      elapsedSecs +
+      MARKER_DELAY_SECS +
+      (this.props.song.track?.lagSeconds ?? 0);
 
     while (
       this.nextIndex < this.props.beatMap.length &&

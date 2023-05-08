@@ -8,12 +8,17 @@ export interface SongInfo {
   bpm: number;
   jacketUrl: string | null;
   levels: SongLevel[];
-  trackUrl?: string;
+  track?: SongTrack;
 }
-
 export interface SongLevel {
   level: number;
   difficulty: string;
   notes: string;
   beatMapUrl: string | null;
+}
+
+export interface SongTrack {
+  url: string;
+  volume: number;
+  lagSeconds: number;
 }

@@ -1,8 +1,8 @@
+import { SongTrack } from '../../types';
 import { loadAudio } from '../../utils/audio';
-import { Song } from '../types';
 
-export async function loadTrack(song: Song) {
-  const audio = await loadAudio(song.track.url);
-  audio.volume = song.track.volume;
+export async function loadTrack(track: SongTrack) {
+  const audio = await loadAudio(track.url);
+  audio.volume = track.volume;
   return audio;
 }

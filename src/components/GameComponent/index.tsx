@@ -1,12 +1,13 @@
 import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { Game } from '../../game';
-import { Assets, BeatMap, Song, Voices } from '../../game/types';
+import { Assets, BeatMap, Voices } from '../../game/types';
+import { SongInfo } from '../../types';
 import { sleep } from '../../utils';
 import styles from './styles.module.css';
 
 export interface GameComponentProps {
-  song: Song;
+  song: SongInfo;
   beatMap: BeatMap;
   audio: HTMLAudioElement;
   assets: Assets;
@@ -78,9 +79,6 @@ export function GameComponent(props: GameComponentProps) {
 
   return (
     <main>
-      <div>
-        {props.song.songName} {props.beatMap.difficulty}
-      </div>
       <div>{score}</div>
       <div>
         <button onClick={pause}>Pause</button>{' '}
