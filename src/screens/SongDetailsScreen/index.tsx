@@ -12,6 +12,11 @@ export function SongDetailsScreen(props: SongDetailsScreenProps) {
     <>
       <SongSummary song={props.song} />
 
+      <div>{props.song.title.romaji}</div>
+      <div>{props.song.title.original}</div>
+
+      <hr></hr>
+
       <div>
         {props.song.levels.map((level) => (
           <div key={level.level} onClick={() => props.onSelectLevel?.(level)}>

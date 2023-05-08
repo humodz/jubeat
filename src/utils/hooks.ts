@@ -7,6 +7,7 @@ export type LoaderResult<T> =
   | { status: 'success'; data: T }
   | { status: 'error'; error: any };
 
+/** @deprecated */
 export function useLoader<T>(factory: () => Promise<T>) {
   const [status, setStatus] = useState<Status>('loading');
   const [data, setData] = useState<T>();

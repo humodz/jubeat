@@ -1,11 +1,11 @@
 import Fuse from 'fuse.js';
 import { debounce } from 'lodash';
 import { ChangeEvent, useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
 import { SearchInput } from '../../components/SearchInput';
 import { SongSummary } from '../../components/SongSummary';
 import { SongInfo } from '../../types';
-import { by, intlCompare } from '../../utils';
-import { useLoader } from '../../utils/hooks';
+import { by, fetchJson, intlCompare } from '../../utils';
 
 interface SongSelectScreenProps {
   onSelect?: (song: SongInfo) => void;
@@ -27,7 +27,7 @@ export function SongSelectScreen(props: SongSelectScreenProps) {
   }
 
   if (query.status === 'error') {
-    return <p>ERROR {query.error.message}</p>;
+    return <p>ERROR {getErrorMessage(query)}</p>;
   }
 
   return (
@@ -45,14 +45,7 @@ export function SongSelectScreen(props: SongSelectScreenProps) {
 }
 
 function useSongSearch(searchTerm: string) {
-  const songsQuery = useLoader(async () => {
-    const response = await fetch('game-data/songs.json');
-    const allSongs = (await response.json()) as SongInfo[];
-
-    return allSongs
-      .filter((song) => song.levels.some((level) => level.beatMapUrl !== null))
-      .sort(by((it) => it.title.romaji || it.title.original, intlCompare));
-  });
+  const songsQuery = useQuery('songs', getSongs);
 
   const fuse = useMemo(() => {
     if (songsQuery.status !== 'success') {
@@ -77,4 +70,16 @@ function useSongSearch(searchTerm: string) {
   }, [fuse, searchTerm, songsQuery]);
 
   return { songs, query: songsQuery };
+}
+
+async function getSongs() {
+  const allSongs = await fetchJson<SongInfo[]>('game-data/songs.json');
+
+  return allSongs
+    .filter((song) => song.levels.some((level) => level.beatMapUrl !== null))
+    .sort(by((it) => it.title.romaji || it.title.original, intlCompare));
+}
+
+function getErrorMessage(query: { error: unknown }) {
+  return (query.error as any)?.message || 'Unknown error';
 }

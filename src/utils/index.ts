@@ -14,31 +14,12 @@ export function clear<T>(array: T[]): void {
   array.splice(0, array.length);
 }
 
-export function rotation(normalized: number) {
-  return 2 * Math.PI * normalized;
-}
-
-export function degreesToRadians(degrees: number) {
-  return (2 * Math.PI * degrees) / 360;
-}
-
 export function last<T>(items: T[]): T {
   return items[items.length - 1];
 }
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((ok) => setTimeout(ok, ms));
-}
-
-export function lazyInit<T>(factory: () => T) {
-  let value: T;
-
-  return () => {
-    if (!value) {
-      value = factory();
-    }
-    return value;
-  };
 }
 
 export function waitEvent(target: EventTarget, event: string) {
@@ -69,3 +50,17 @@ const collator = new Intl.Collator(undefined, {
 
 export const intlCompare = (key1: string, key2: string) =>
   collator.compare(key1, key2);
+
+export async function fetchJson<Result>(
+  ...args: Parameters<typeof fetch>
+): Promise<Result> {
+  const response = await fetch(...args);
+
+  if (!response.ok) {
+    throw Object.assign(new Error(`Request failed: ${response.status}`), {
+      response,
+    });
+  }
+
+  return await response.json();
+}

@@ -8,6 +8,8 @@ const trackData = {
   volume: 0.2,
 };
 
+void trackData;
+
 type Screen =
   | { type: 'song-select' }
   | { type: 'song-details'; song: SongInfo }
