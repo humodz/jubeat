@@ -1,12 +1,4 @@
 # jubeat
-
-## TODO
-
-- install redux
-- install react router
-- install talwind
-
-
 ## state management
 
 - zustand
