@@ -8,6 +8,7 @@ export interface SongInfo {
   bpm: number;
   jacketUrl: string | null;
   levels: SongLevel[];
+  trackUrl?: string;
 }
 
 export interface SongLevel {

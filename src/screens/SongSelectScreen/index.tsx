@@ -73,10 +73,14 @@ function useSongSearch(searchTerm: string) {
 }
 
 async function getSongs() {
-  const allSongs = await fetchJson<SongInfo[]>('game-data/songs.json');
+  const [allSongs, trackMap] = await Promise.all([
+    fetchJson<SongInfo[]>('game-data/songs.json'),
+    fetchJson<Record<string, string>>('game-data/track-map.json'),
+  ]);
 
   return allSongs
     .filter((song) => song.levels.some((level) => level.beatMapUrl !== null))
+    .map((song) => ({ ...song, trackUrl: trackMap[song.id] }))
     .sort(by((it) => it.title.romaji || it.title.original, intlCompare));
 }
 

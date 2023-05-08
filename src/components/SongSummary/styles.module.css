@@ -17,8 +17,40 @@
 
 .title {
   text-overflow: ellipsis;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   overflow-x: hidden;
+}
+
+.title div {
+  display: inline-block;
+  min-width: 100%;
+  white-space: nowrap;
+
+  animation-name: marquee;
+  animation-duration: 5s;
+  animation-delay: 0s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes marquee {
+  0% {
+    margin-left: 0%;
+    transform: translateX(0%);
+  }
+  10% {
+    margin-left: 0%;
+    transform: translateX(0%);
+  }
+  90% {
+    margin-left: 100%;
+    transform: translateX(-100%);
+  }
+  100% {
+    margin-left: 100%;
+    transform: translateX(-100%);
+  }
 }
 
 .artist {

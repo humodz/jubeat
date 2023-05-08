@@ -23,7 +23,9 @@ export function SongSummary(props: SongSummaryProps) {
         loading="lazy"
       />
       <div className={styles.details}>
-        <div className={styles.title}>{title}</div>
+        <div className={styles.title}>
+          <div>{title}</div>
+        </div>
         <div className={styles.artist}>{song.artist}</div>
 
         <div>
