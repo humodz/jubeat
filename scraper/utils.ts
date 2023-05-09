@@ -1,8 +1,10 @@
+import * as Async from 'async';
 import axios from 'axios';
 import { createHash } from 'crypto';
 import { existsSync } from 'fs';
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import * as inquirer from 'inquirer';
+import ms from 'ms';
 import { dirname, join } from 'path';
 import { Stream } from 'stream';
 
@@ -135,20 +137,52 @@ export async function fetchWithCache(cachePath: string, url: string) {
 export async function progress<T, R>(
   title: string,
   items: T[],
-  process: (item: T) => Promise<R>,
+  processFn: (item: T) => Promise<R>,
 ): Promise<R[]> {
+  const concurrency = Number(process.env.CONCURRENCY) || 4;
   const ui = new inquirer.ui.BottomBar();
   await inquirer.prompt([]);
   let done = 0;
 
   ui.updateBottomBar(`${title} ${done} / ${items.length} `);
 
-  return await Promise.all(
-    items.map(async (item) => {
-      const result = await process(item);
-      done += 1;
-      ui.updateBottomBar(`${title} ${done} / ${items.length} `);
-      return result;
-    }),
+  const startTime = Date.now();
+
+  const worker = async (item: T) => {
+    const result = await processFn(item);
+    done += 1;
+
+    const elapsed = Date.now() - startTime;
+    const estimated = (elapsed / done) * items.length;
+
+    ui.updateBottomBar(
+      `${title} ${done} / ${items.length} - est. ${ms(estimated - elapsed)} `,
+    );
+
+    return result;
+  };
+
+  console.log();
+
+  const queue = Async.queue(worker, concurrency);
+  const promises = await queue.pushAsync<Promise<R>[]>(items);
+  const results = await Promise.allSettled(promises);
+
+  throwIfFailed(results);
+
+  return results.map((it) => it.value);
+}
+
+function throwIfFailed<R>(
+  results: PromiseSettledResult<R>[],
+): asserts results is PromiseFulfilledResult<R>[] {
+  const failed = results.filter(
+    (it): it is PromiseRejectedResult => it.status === 'rejected',
   );
+
+  if (failed.length > 0) {
+    throw Object.assign(new Error(`There were some errors: ${failed.length}`), {
+      errors: failed.map((it) => it.reason),
+    });
+  }
 }

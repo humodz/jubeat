@@ -12,7 +12,7 @@
     "allowJs": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,

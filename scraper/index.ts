@@ -1,5 +1,6 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import { summarizeResponses } from './axios';
 import {
   downloadJackets,
   getBeatMapFilename,
@@ -11,11 +12,14 @@ import {
 import { cache, hash, saveJson } from './utils';
 
 async function main() {
+  summarizeResponses(axios);
+
   axiosRetry(axios, {
     retries: 3,
     shouldResetTimeout: true,
     retryDelay(retryCount, error) {
       console.error('[axios-retry]', error);
+      console.info('Retrying...');
       return 1000 * Math.pow(2, retryCount) * (1 + Math.random() / 5);
     },
   });
