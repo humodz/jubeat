@@ -12,6 +12,7 @@ export interface GameButtonProps {
   x: number;
   y: number;
   assets: Assets;
+  onMiss: () => void;
 }
 
 export class GameButton {
@@ -43,7 +44,11 @@ export class GameButton {
     this.startHere.height = this.props.size;
     this.startHere.visible = false;
 
-    this.marker = this.createAnimatedMarker(props.assets.marker, markerMs);
+    this.marker = this.createAnimatedMarker(
+      props.assets.marker,
+      markerMs,
+      true,
+    );
     this.bad = this.createAnimatedMarker(props.assets.bad, judgeMs);
     this.good = this.createAnimatedMarker(props.assets.good, judgeMs);
     this.great = this.createAnimatedMarker(props.assets.great, judgeMs);
@@ -95,7 +100,11 @@ export class GameButton {
     }
   }
 
-  private createAnimatedMarker(textures: PIXI.Texture[], durationMs: number) {
+  private createAnimatedMarker(
+    textures: PIXI.Texture[],
+    durationMs: number,
+    canMiss = false,
+  ) {
     const frames = textures.map((texture) => ({
       texture,
       time: durationMs / textures.length,
@@ -103,6 +112,9 @@ export class GameButton {
 
     const sprite = new PIXI.AnimatedSprite(frames);
     sprite.onComplete = () => {
+      if (canMiss) {
+        this.props.onMiss();
+      }
       sprite.visible = false;
     };
     sprite.loop = false;

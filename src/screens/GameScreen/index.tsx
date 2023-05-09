@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { GameComponent } from '../../components/GameComponent';
+import { GameContainer } from '../../components/GameContainer';
 import { loadAssets } from '../../game/loaders/assets';
 import { loadTrack } from '../../game/loaders/track';
 import { loadVoices } from '../../game/loaders/voices';
@@ -11,6 +10,7 @@ import { useLoader } from '../../utils/hooks';
 interface GameScreenProps {
   song: SongInfo;
   level: SongLevel;
+  onFinish: () => void;
 }
 
 export function GameScreen(props: GameScreenProps) {
@@ -23,8 +23,6 @@ export function GameScreen(props: GameScreenProps) {
     ]);
     return { audio, assets, voices, beatMap };
   });
-
-  const [isStarted, setIsStarted] = useState(false);
 
   if (dataQuery.status === 'loading') {
     return <p>Loading...</p>;
@@ -42,19 +40,14 @@ export function GameScreen(props: GameScreenProps) {
 
   return (
     <>
-      <p>
-        <button onClick={() => setIsStarted(true)}>Start</button>
-      </p>
-      {isStarted && (
-        <GameComponent
-          song={props.song}
-          beatMap={beatMap}
-          audio={audio}
-          voices={voices}
-          assets={assets}
-          onFinish={() => setIsStarted(false)}
-        />
-      )}
+      <GameContainer
+        song={props.song}
+        beatMap={beatMap}
+        audio={audio}
+        voices={voices}
+        assets={assets}
+        onFinish={props.onFinish}
+      />
     </>
   );
 }

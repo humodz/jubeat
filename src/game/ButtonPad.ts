@@ -10,7 +10,7 @@ export interface ButtonPadProps {
   gridCols: number;
 
   assets: Assets;
-  onJudgement(judgement: 'bad' | 'good' | 'great' | 'perfect'): void;
+  onJudgement(judgement: 'bad' | 'good' | 'great' | 'perfect' | 'miss'): void;
 }
 
 export class ButtonPad {
@@ -26,6 +26,9 @@ export class ButtonPad {
           x: props.buttonSize * (i % props.gridCols),
           y: props.buttonSize * Math.floor(i / props.gridCols),
           assets: props.assets,
+          onMiss() {
+            props.onJudgement('miss');
+          },
         }),
     );
 

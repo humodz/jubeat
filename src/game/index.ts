@@ -20,7 +20,7 @@ interface GameProps {
   beatMap: BeatMapStep[];
   audio: HTMLAudioElement;
   assets: Assets;
-  onScoreUpdate?: (score: number) => void;
+  onScoreUpdate?: (score: number, combo: number) => void;
   onFinish?: () => void;
 }
 
@@ -42,6 +42,7 @@ export class Game {
   touchList: Point[];
 
   score = 0;
+  combo = 0;
   maxScore: number;
   nextIndex = 0;
   elapsedSecs = -GAME_START_DELAY_SECONDS;
@@ -66,7 +67,15 @@ export class Game {
       gridRows: GRID_ROWS,
       assets: this.props.assets,
       onJudgement: (judgement) => {
-        this.score += this.scoreMap[judgement];
+        if (judgement === 'miss') {
+          this.combo = 0;
+        } else {
+          this.score += this.scoreMap[judgement];
+          this.combo += 1;
+        }
+
+        const realScore = Math.floor((1000000 * this.score) / this.maxScore);
+        this.props.onScoreUpdate?.(realScore, this.combo);
       },
     });
 
@@ -106,9 +115,6 @@ export class Game {
 
       this.nextIndex++;
     }
-
-    const realScore = Math.floor((1000000 * this.score) / this.maxScore);
-    this.props.onScoreUpdate?.(realScore);
 
     this.buttonPad.tick(this.touchList);
     this.touchPointers.tick(this.touchList);

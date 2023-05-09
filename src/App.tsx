@@ -35,7 +35,13 @@ export function App() {
   } else if (screen.type === 'game') {
     return (
       <>
-        <GameScreen song={screen.song} level={screen.level} />
+        <GameScreen
+          song={screen.song}
+          level={screen.level}
+          onFinish={() =>
+            setScreen({ type: 'song-details', song: screen.song })
+          }
+        />
       </>
     );
   }
