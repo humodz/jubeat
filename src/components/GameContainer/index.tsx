@@ -17,7 +17,6 @@ export interface GameContainerProps {
 
 export function GameContainer(props: GameContainerProps) {
   const [isAnimated, setIsAnimated] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
 
@@ -64,6 +63,19 @@ export function GameContainer(props: GameContainerProps) {
     run();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    function onBlur() {
+      gameRef.current?.pause();
+      setIsPaused(true);
+    }
+
+    window.addEventListener('blur', onBlur);
+
+    return () => window.removeEventListener('blur', onBlur);
   }, []);
 
   const togglePause = () => {
