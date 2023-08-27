@@ -127,12 +127,15 @@ export class Game {
     this.props.onFinish?.();
   }
 
+  // TODO why did I remove ticker start/stop from these methods in the past?
   resume() {
+    this.pixi.ticker.start();
     this.buttonPad.resume();
     this.props.audio.play();
   }
 
   pause() {
+    this.pixi.ticker.stop();
     this.buttonPad.pause();
     this.props.audio.pause();
   }

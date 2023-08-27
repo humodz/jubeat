@@ -27,7 +27,7 @@
   white-space: nowrap;
 
   animation-name: marquee;
-  animation-duration: 5s;
+  animation-duration: 8s;
   animation-delay: 0s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -39,11 +39,11 @@
     margin-left: 0%;
     transform: translateX(0%);
   }
-  10% {
+  20% {
     margin-left: 0%;
     transform: translateX(0%);
   }
-  90% {
+  80% {
     margin-left: 100%;
     transform: translateX(-100%);
   }
